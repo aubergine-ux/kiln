@@ -25,8 +25,11 @@
 
   const LOADER_TABS: Loader[] = ['vanilla', 'fabric', 'forge', 'neoforge', 'quilt']
   let loader = $state<Loader>(value.loader === 'other' || value.loader === 'optifine' ? 'vanilla' : value.loader)
-  let custom = $state('')
-  let mode = $state<'installed' | 'new'>('installed')
+  // A loader that isn't installed yet starts in "install for another version" with its game version filled in.
+  // svelte-ignore state_referenced_locally
+  let custom = $state(value.loader !== 'vanilla' && !value.installed ? value.mcVersion : '')
+  // svelte-ignore state_referenced_locally
+  let mode = $state<'installed' | 'new'>(value.loader !== 'vanilla' && !value.installed ? 'new' : 'installed')
 
   const installedForLoader = $derived(app.versions.filter((v) => (loader === 'vanilla' ? v.loader === 'vanilla' : v.loader === loader)))
   const vanillaVersions = $derived(app.versions.filter((v) => v.loader === 'vanilla'))
