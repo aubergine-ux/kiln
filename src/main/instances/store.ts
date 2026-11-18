@@ -6,6 +6,7 @@ import { getSettings, updateSettings } from '../settings'
 import { layout } from '../paths'
 import { KilnError } from '../util/errors'
 import { exists, listDir, nowIso, readJson, slugify, statOrNull, uniquePath, writeJson } from '../util/fs'
+import { withLock } from '../util/lock'
 import { fileUrl, trash } from '../files'
 import { buildJavaArgs, removeProfile, upsertProfile } from '../launcher/profiles'
 import { isVersionReady, listInstalledVersions } from '../launcher/versions'
@@ -162,7 +163,11 @@ export type InstancePatch = Partial<
   Pick<InstanceConfig, 'name' | 'versionId' | 'mcVersion' | 'loader' | 'loaderVersion' | 'group' | 'pinned' | 'memoryMb' | 'extraJavaArgs' | 'notes'>
 >
 
-export async function updateInstance(id: string, patch: InstancePatch): Promise<Instance> {
+export function updateInstance(id: string, patch: InstancePatch): Promise<Instance> {
+  return withLock(`instance:${id}`, () => updateNow(id, patch))
+}
+
+async function updateNow(id: string, patch: InstancePatch): Promise<Instance> {
   const config = await readConfig(id)
   const next: InstanceConfig = { ...config, ...patch }
   if (patch.name !== undefined) {
@@ -182,7 +187,11 @@ export async function updateInstance(id: string, patch: InstancePatch): Promise<
 }
 
 /** Save an icon. `png` is a PNG rendered by the UI (data: URL), used for both Kiln and the launcher. */
-export async function setIcon(id: string, icon: InstanceIcon, png: string): Promise<Instance> {
+export function setIcon(id: string, icon: InstanceIcon, png: string): Promise<Instance> {
+  return withLock(`instance:${id}`, () => setIconNow(id, icon, png))
+}
+
+async function setIconNow(id: string, icon: InstanceIcon, png: string): Promise<Instance> {
   const s = await getSettings()
   const data = Buffer.from(png.replace(/^data:image\/png;base64,/, ''), 'base64')
   if (!data.length) throw new KilnError('That image could not be used as an icon.')
@@ -235,7 +244,7 @@ export async function playInstance(id: string): Promise<PlayResult> {
   const instance = await getInstance(id)
   const launcherWasRunning = await isLauncherRunning()
   await syncProfile(id, true)
-  await writeConfig(id, { ...(await readConfig(id)), lastPlayed: nowIso() })
+  await withLock(`instance:${id}`, async () => writeConfig(id, { ...(await readConfig(id)), lastPlayed: nowIso() }))
   await openLauncher(s.launcher, s.minecraftDir)
   return { launcherWasRunning, versionMissing: !instance.versionInstalled }
 }

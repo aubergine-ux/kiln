@@ -83,3 +83,10 @@ describe('helpers', () => {
     expect(safeJoin('/a/b', 'mods/x.jar')).toBe(path.resolve('/a/b/mods/x.jar'))
   })
 })
+
+describe('concurrent edits', () => {
+  it('keeps every profile when many are written at once', async () => {
+    await Promise.all(Array.from({ length: 12 }, (_, i) => upsertProfile(mc, data, null, { ...input, id: `p${i}`, name: `P${i}` })))
+    expect(Object.keys((await read()).profiles).sort()).toEqual(Array.from({ length: 12 }, (_, i) => `p${i}`).sort())
+  })
+})

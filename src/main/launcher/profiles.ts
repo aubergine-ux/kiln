@@ -3,6 +3,7 @@ import path from 'node:path'
 import type { LauncherCandidate } from '@shared/types'
 import { KilnError } from '../util/errors'
 import { exists, nowIso, writeFileAtomic } from '../util/fs'
+import { withLock } from '../util/lock'
 import { layout } from '../paths'
 
 /**
@@ -79,6 +80,15 @@ async function backup(file: string, dataDir: string): Promise<void> {
 
 /** Back up, apply `change` to every profiles file, and write them back. */
 async function edit(
+  minecraftDir: string,
+  dataDir: string,
+  launcher: LauncherCandidate | null,
+  change: (data: ProfilesFile) => void
+): Promise<void> {
+  return withLock(`profiles:${minecraftDir}`, () => editNow(minecraftDir, dataDir, launcher, change))
+}
+
+async function editNow(
   minecraftDir: string,
   dataDir: string,
   launcher: LauncherCandidate | null,
