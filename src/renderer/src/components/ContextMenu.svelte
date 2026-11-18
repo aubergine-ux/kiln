@@ -80,12 +80,11 @@
     min-width: 210px;
     max-height: 70vh;
     overflow: auto;
-    padding: 6px;
+    padding: 4px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow-lg);
-    animation: pop-in 140ms var(--ease);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-3);
+    box-shadow: var(--shadow-pop);
     -webkit-app-region: no-drag;
   }
   button {
@@ -93,11 +92,11 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    height: 34px;
+    height: 32px;
     padding: 0 10px 0 8px;
     border: none;
     background: none;
-    border-radius: 8px;
+    border-radius: var(--r-2);
     text-align: left;
     color: var(--text);
     font-size: 13.5px;

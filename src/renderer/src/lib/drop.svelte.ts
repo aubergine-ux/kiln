@@ -42,7 +42,7 @@ export async function dropFiles(paths: string[], instanceId?: string): Promise<v
       }
     }
     const content = classified.filter((c) => c.kind !== 'modpack')
-    if (content.length) toast('info', 'Open an instance first', 'Drop mods, packs and worlds onto an instance card or into an open instance.')
+    if (content.length) toast('info', 'Open an instance first', 'Drop mods and packs onto an instance, or open one and drop them there.')
     return
   }
 
@@ -50,14 +50,14 @@ export async function dropFiles(paths: string[], instanceId?: string): Promise<v
   for (const c of classified) {
     if (c.kind === 'modpack') continue
     if (c.kind === 'unknown') {
-      toast('warn', `Kiln doesn't know what "${c.path.split(/[\\/]/).pop()}" is`, 'Kiln accepts mods (.jar), resource packs, shader packs, data packs, worlds and modpacks.')
+      toast('warn', `Kiln can't tell what "${c.path.split(/[\\/]/).pop()}" is`, "It doesn't look like a mod, pack, world or modpack.")
       continue
     }
     let ok: unknown
     if (c.kind === 'world') ok = await attempt(() => api.worlds.import(instanceId, c.path))
     else if (c.kind === 'datapacks') {
       if (!dropState.datapackWorld) {
-        toast('info', 'Pick a world for this data pack', 'Data packs belong to a world. Open the Data packs tab, choose a world, then drop it there.')
+        toast('info', 'Pick a world for this data pack', 'Data packs live inside a world. Open the Data packs tab, pick a world and drop it there.')
         continue
       }
       ok = await attempt(() => api.content.install(instanceId, 'datapacks', [c.path], dropState.datapackWorld!))

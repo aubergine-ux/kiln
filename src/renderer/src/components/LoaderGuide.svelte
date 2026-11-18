@@ -34,7 +34,7 @@
 </script>
 
 <div class="guide" class:compact>
-  <div class="icon"><Icon name="Wrench" size={20} /></div>
+  <div class="icon"><Icon name="Wrench" size={18} /></div>
   <div class="body">
     <strong>Install {info.label} {inst.loaderVersion ?? ''} for {inst.mcVersion} to play this instance</strong>
     {#if !/^1\.\d/.test(inst.mcVersion)}
@@ -52,7 +52,7 @@
     {/if}
     <div class="row">
       {#if url}<button class="btn sm primary" onclick={() => api.shell.openExternal(url)}><Icon name="ExternalLink" size={15} /> Get the {info.label} installer</button>{/if}
-      <span class="watch"><Icon name="LoaderCircle" size={14} class="spin" /> Watching for {inst.versionId}</span>
+      <span class="watch"><Icon name="LoaderCircle" size={13} class="spin" /> waiting for {inst.versionId}</span>
     </div>
   </div>
 </div>
@@ -60,28 +60,23 @@
 <style>
   .guide {
     display: flex;
-    gap: 14px;
-    padding: 16px 18px;
-    border-radius: var(--radius-lg);
-    background: color-mix(in oklab, var(--warn) 9%, var(--surface));
-    border: 1px solid color-mix(in oklab, var(--warn) 30%, var(--border));
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--r-3);
+    background: color-mix(in oklab, var(--warn) 7%, var(--surface));
+    border: 1px solid color-mix(in oklab, var(--warn) 28%, var(--border));
   }
   .icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
     flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    color: color-mix(in oklab, var(--warn) 85%, var(--text));
-    background: color-mix(in oklab, var(--warn) 16%, transparent);
+    margin-top: 1px;
+    color: var(--warn);
   }
   .body {
     flex: 1;
     min-width: 0;
   }
   strong {
-    font-weight: 650;
+    font-weight: 600;
   }
   p {
     color: var(--text-2);
@@ -105,7 +100,8 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12.5px;
+    font-size: 12px;
     color: var(--muted);
+    font-family: var(--font-mono);
   }
 </style>

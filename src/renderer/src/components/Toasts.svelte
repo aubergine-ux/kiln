@@ -1,6 +1,6 @@
 <script lang="ts">
   import { flip } from 'svelte/animate'
-  import { fly } from 'svelte/transition'
+  import { fade, fly } from 'svelte/transition'
   import { dismissToast, toasts } from '@/lib/state.svelte'
   import Icon from './Icon.svelte'
 
@@ -9,7 +9,7 @@
 
 <div class="toasts" aria-live="polite">
   {#each toasts as t (t.id)}
-    <div class="toast {t.kind}" animate:flip={{ duration: 200 }} in:fly={{ y: 16, duration: 220 }} out:fly={{ x: 40, duration: 180 }}>
+    <div class="toast {t.kind}" animate:flip={{ duration: 200 }} in:fly={{ y: 10, duration: 160 }} out:fade={{ duration: 120 }}>
       <span class="ic"><Icon name={icons[t.kind]} size={20} /></span>
       <div class="text">
         <strong>{t.title}</strong>
@@ -30,30 +30,31 @@
     bottom: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     z-index: 300;
-    width: min(400px, calc(100vw - 40px));
+    width: min(380px, calc(100vw - 40px));
     pointer-events: none;
   }
   .toast {
     pointer-events: auto;
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: flex-start;
-    padding: 14px 10px 14px 14px;
-    border-radius: 16px;
+    padding: 12px 8px 12px 12px;
+    border-radius: var(--r-3);
     background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-strong);
+    border-left: 3px solid var(--kind);
+    box-shadow: var(--shadow-pop);
   }
+  .ok { --kind: var(--ok); }
+  .error { --kind: var(--danger); }
+  .info { --kind: var(--info); }
+  .warn { --kind: var(--warn); }
   .ic {
     margin-top: 1px;
+    color: var(--kind);
   }
-  .ok .ic { color: var(--ok); }
-  .error .ic { color: var(--danger); }
-  .info .ic { color: var(--info); }
-  .warn .ic { color: var(--warn); }
-  .error { border-color: color-mix(in oklab, var(--danger) 35%, var(--border)); }
   .text {
     flex: 1;
     min-width: 0;
@@ -65,13 +66,13 @@
   p {
     color: var(--text-2);
     font-size: 13px;
-    margin-top: 3px;
+    margin-top: 2px;
     white-space: pre-line;
   }
   .text .btn {
-    margin-top: 10px;
+    margin-top: 8px;
   }
   .close {
-    margin-top: -4px;
+    margin-top: -3px;
   }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fade, scale } from 'svelte/transition'
+  import { fade } from 'svelte/transition'
   import type { Instance, Screenshot } from '@shared/types'
   import { api } from '@/lib/api'
   import { attempt, confirm, toast } from '@/lib/state.svelte'
@@ -62,16 +62,16 @@
 <div class="toolbar">
   <h3>{shots.length} {shots.length === 1 ? 'screenshot' : 'screenshots'}</h3>
   <div class="spacer"></div>
-  <button class="btn" onclick={() => api.instances.openFolder(inst.id, 'screenshots')}><Icon name="FolderOpen" size={16} /> Open folder</button>
+  <button class="btn" onclick={() => api.instances.openFolder(inst.id, 'screenshots')}>Open folder</button>
 </div>
 
 <div class="scroll">
   {#if !loading && shots.length === 0}
-    <EmptyState icon="Camera" title="No screenshots yet" body="Press F2 in the game to take one. They'll show up here, ready to open, copy or share." />
+    <EmptyState art="camera" title="No screenshots yet" body="Press F2 in the game to take one. It will show up here." />
   {:else}
     <div class="grid">
       {#each shots as s, i (s.file)}
-        <button class="shot" style:--d="{Math.min(i, 20) * 20}ms" onclick={() => (open = i)} oncontextmenu={(e) => (e.preventDefault(), menu(e, s))}>
+        <button class="shot" onclick={() => (open = i)} oncontextmenu={(e) => (e.preventDefault(), menu(e, s))}>
           <img src={s.url} alt={s.file} loading="lazy" draggable="false" />
           <span class="cap">{dateTime(s.created)}</span>
         </button>
@@ -84,19 +84,19 @@
   <div class="lightbox" transition:fade={{ duration: 150 }} role="dialog" aria-label="Screenshot">
     <button class="close-area" aria-label="Close" onclick={() => (open = null)}></button>
     {#key current.file}
-      <img src={current.url} alt={current.file} in:scale={{ start: 0.97, duration: 180 }} />
+      <img src={current.url} alt={current.file} />
     {/key}
     <button class="nav prev" aria-label="Previous" onclick={() => (open = (open! - 1 + shots.length) % shots.length)}><Icon name="ChevronLeft" size={26} /></button>
     <button class="nav next" aria-label="Next" onclick={() => (open = (open! + 1) % shots.length)}><Icon name="ChevronRight" size={26} /></button>
     <div class="bar">
       <div class="bar-text">
         <strong>{current.file}</strong>
-        <span>{dateTime(current.created)} · {bytes(current.size)} · {open! + 1} of {shots.length}</span>
+        <span>{dateTime(current.created)}, {bytes(current.size)}, {open! + 1} of {shots.length}</span>
       </div>
       <button class="btn sm" onclick={() => api.screenshots.open(inst.id, current.file)}><Icon name="ExternalLink" size={15} /> Open</button>
-      <button class="btn sm" onclick={() => copy(current)}><Icon name="Copy" size={15} /> Copy</button>
-      <button class="btn sm" onclick={() => api.screenshots.reveal(inst.id, current.file)}><Icon name="FolderOpen" size={15} /> Show</button>
-      <button class="btn sm danger" onclick={() => remove(current)}><Icon name="Trash2" size={15} /> Delete</button>
+      <button class="btn sm" onclick={() => copy(current)}>Copy</button>
+      <button class="btn sm" onclick={() => api.screenshots.reveal(inst.id, current.file)}>Show</button>
+      <button class="btn sm danger" onclick={() => remove(current)}>Delete</button>
       <button class="btn sm icon" aria-label="Close" onclick={() => (open = null)}><Icon name="X" size={16} /></button>
     </div>
   </div>
@@ -106,7 +106,7 @@
   .toolbar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     padding: 16px 28px 12px;
   }
   .toolbar h3 {
@@ -122,24 +122,17 @@
   }
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
   }
   .shot {
     position: relative;
     padding: 0;
-    border: 1px solid var(--border);
-    border-radius: 14px;
+    border: none;
+    border-radius: var(--r-2);
     overflow: hidden;
     aspect-ratio: 16 / 9;
-    background: var(--surface-2);
-    animation: pop-in 300ms var(--ease) both;
-    animation-delay: var(--d);
-    transition: transform var(--med) var(--ease), box-shadow var(--med);
-  }
-  .shot:hover {
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: var(--shadow);
+    background: var(--surface-3);
   }
   .shot img {
     width: 100%;
@@ -147,31 +140,34 @@
     object-fit: cover;
     display: block;
   }
+  .shot:hover img {
+    filter: brightness(1.06);
+  }
   .cap {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    padding: 18px 10px 8px;
-    font-size: 12px;
+    padding: 16px 8px 6px;
+    font-size: 11.5px;
     color: white;
     text-align: left;
-    background: linear-gradient(transparent, rgb(0 0 0 / 0.6));
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.55));
     opacity: 0;
     transition: opacity var(--fast);
   }
-  .shot:hover .cap {
+  .shot:hover .cap,
+  .shot:focus-visible .cap {
     opacity: 1;
   }
   .lightbox {
     position: fixed;
     inset: 0;
     z-index: 120;
-    background: rgb(8 6 4 / 0.9);
-    backdrop-filter: blur(10px);
+    background: rgb(12 10 8 / 0.94);
     display: grid;
     place-items: center;
-    padding: 60px 80px 100px;
+    padding: 56px 80px 96px;
     -webkit-app-region: no-drag;
   }
   .close-area {
@@ -185,26 +181,24 @@
     position: relative;
     max-width: 100%;
     max-height: 100%;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgb(0 0 0 / 0.5);
+    border-radius: var(--r-2);
     pointer-events: none;
   }
   .nav {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: none;
     color: white;
-    background: rgb(255 255 255 / 0.12);
+    background: rgb(255 255 255 / 0.1);
     display: grid;
     place-items: center;
-    transition: background var(--fast);
   }
   .nav:hover {
-    background: rgb(255 255 255 / 0.22);
+    background: rgb(255 255 255 / 0.2);
   }
   .prev {
     left: 18px;
@@ -214,17 +208,16 @@
   }
   .bar {
     position: absolute;
-    bottom: 22px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 8px 8px 16px;
-    border-radius: 16px;
+    gap: 6px;
+    padding: 6px 6px 6px 14px;
+    border-radius: var(--r-3);
     background: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
     max-width: calc(100vw - 40px);
   }
   .bar-text {
@@ -234,8 +227,9 @@
     min-width: 0;
   }
   .bar-text strong {
-    font-weight: 600;
-    font-size: 13px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 12px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

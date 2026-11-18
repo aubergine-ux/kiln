@@ -15,7 +15,7 @@
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     padding: 12px 150px 0 28px;
   }
   .topbar.mac {

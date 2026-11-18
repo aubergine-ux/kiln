@@ -11,7 +11,6 @@
 
   let tab = $state<'modpack' | 'launchers'>('modpack')
 
-  // ----- Modpack file -----
   let file = $state<string | null>(null)
   let summary = $state<ModpackSummary | null>(null)
   let name = $state('')
@@ -51,7 +50,6 @@
     }
   }
 
-  // ----- Other launchers -----
   let found = $state<ExternalInstance[] | null>(null)
   let selected = $state<Set<string>>(new Set())
   let importingExternal = $state(false)
@@ -177,9 +175,9 @@
     {/if}
   {:else}
     {#if found === null}
-      <p class="hint loading"><Icon name="LoaderCircle" size={16} class="spin" /> Looking for other launchers…</p>
+      <p class="hint loading"><Icon name="LoaderCircle" size={16} class="spin" /> Looking for other launchers</p>
     {:else if found.length === 0}
-      <p class="hint">No Prism Launcher or CurseForge instances were found in the usual places. Choose a folder to import from.</p>
+      <p class="hint">Kiln didn't find Prism Launcher or CurseForge instances in their usual places. Choose a folder to import from.</p>
     {:else}
       <ul class="ext">
         {#each found as f (f.path)}
@@ -204,7 +202,7 @@
         {/each}
       </ul>
     {/if}
-    <button class="btn sm mt" onclick={pickFolder}><Icon name="FolderOpen" size={15} /> Choose a folder…</button>
+    <button class="btn sm mt" onclick={pickFolder}>Choose a folder…</button>
     <p class="hint mt">Kiln copies the instance's files; nothing in the other launcher is changed.</p>
   {/if}
 
@@ -215,7 +213,7 @@
       {:else}
         <button class="btn" onclick={onclose}>Cancel</button>
         <button class="btn primary" disabled={!summary || importing || !name.trim()} onclick={importPack}>
-          {#if importing}<Icon name="LoaderCircle" size={16} class="spin" /> Importing…{:else}<Icon name="Download" size={16} /> Import modpack{/if}
+          {#if importing}<Icon name="LoaderCircle" size={16} class="spin" /> Importing…{:else}Import modpack{/if}
         </button>
       {/if}
     {:else}
@@ -230,18 +228,17 @@
 <style>
   .tabs {
     display: flex;
-    gap: 4px;
-    padding: 3px;
-    border-radius: 12px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    gap: 2px;
+    padding: 2px;
+    border-radius: var(--r-2);
+    background: var(--surface-3);
     margin-bottom: 18px;
   }
   .tabs button {
     flex: 1;
     height: 34px;
     border: none;
-    border-radius: 9px;
+    border-radius: var(--r-1);
     background: none;
     color: var(--muted);
     font-weight: 600;
@@ -253,7 +250,7 @@
   .tabs button.on {
     background: var(--surface);
     color: var(--text);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow);
   }
   .drop {
     width: 100%;
@@ -262,11 +259,11 @@
     align-items: center;
     gap: 6px;
     padding: 38px 20px;
-    border-radius: 16px;
+    border-radius: var(--r-3);
     border: 2px dashed var(--border-strong);
     background: var(--surface-2);
     color: var(--muted);
-    transition: border-color var(--fast), background var(--fast), transform var(--fast);
+    transition: border-color var(--fast), background var(--fast);
   }
   .drop strong {
     color: var(--text);
@@ -276,17 +273,14 @@
   .drop:hover,
   .drop.over {
     border-color: var(--accent);
-    background: var(--accent-softer);
+    background: var(--accent-soft);
     color: var(--accent-text);
-  }
-  .drop.over {
-    transform: scale(1.01);
   }
   .summary {
     display: flex;
     gap: 14px;
     padding: 16px;
-    border-radius: 16px;
+    border-radius: var(--r-3);
     border: 1px solid var(--border);
     background: var(--surface-2);
     align-items: flex-start;
@@ -294,12 +288,12 @@
   .pack-icon {
     width: 52px;
     height: 52px;
-    border-radius: 14px;
+    border-radius: var(--r-3);
     flex-shrink: 0;
     display: grid;
     place-items: center;
-    color: white;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: var(--accent-text);
+    background: var(--accent-soft);
   }
   .pack-text {
     flex: 1;
@@ -348,7 +342,7 @@
   .manual {
     margin-top: 16px;
     padding: 14px;
-    border-radius: 14px;
+    border-radius: var(--r-3);
     border: 1px solid color-mix(in oklab, var(--warn) 30%, var(--border));
     background: color-mix(in oklab, var(--warn) 6%, transparent);
   }
@@ -394,7 +388,7 @@
     max-height: 300px;
     overflow: auto;
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--r-3);
   }
   .ext li + li {
     border-top: 1px solid var(--border);
@@ -418,7 +412,7 @@
   .ph {
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: var(--r-1);
     flex-shrink: 0;
   }
   .ph {

@@ -11,7 +11,7 @@
 
   let { onclose }: { onclose: () => void } = $props()
 
-  const GLYPH_KEYS = ['pickaxe', 'sword', 'tree', 'gem', 'flame', 'castle', 'mountain', 'compass', 'rocket', 'sprout']
+  const GLYPH_KEYS = ['pickaxe', 'sword', 'axe', 'tree', 'gem', 'flame', 'castle', 'mountain', 'potion', 'crown']
   const COLOR_KEYS = ['ember', 'rose', 'violet', 'sky', 'teal', 'moss', 'sand']
   const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
 
@@ -61,7 +61,7 @@
   }
 </script>
 
-<Modal title="New instance" subtitle="A separate setup with its own mods, worlds and settings." {onclose} width={600}>
+<Modal title="New instance" subtitle="It gets its own game folder, separate from your other instances." {onclose} width={580}>
   <div class="top">
     <button class="icon-btn" title="Change icon" onclick={() => (showIcons = !showIcons)}>
       <InstanceIcon_ {icon} url={icon.kind === 'image' ? imageUrl : undefined} size={64} />
@@ -96,7 +96,7 @@
   {#snippet footer()}
     <button class="btn" onclick={onclose}>Cancel</button>
     <button class="btn primary" disabled={!valid || creating} onclick={create}>
-      {#if creating}<Icon name="LoaderCircle" size={16} class="spin" />{:else}<Icon name="Plus" size={16} stroke={2.4} />{/if}
+      {#if creating}<Icon name="LoaderCircle" size={16} class="spin" />{:else}<Icon name="Plus" size={16} />{/if}
       Create instance
     </button>
   {/snippet}
@@ -113,7 +113,7 @@
     border: none;
     background: none;
     padding: 0;
-    border-radius: 18px;
+    border-radius: var(--r-3);
   }
   .edit {
     position: absolute;
@@ -133,10 +133,9 @@
   }
   .icons {
     margin-top: 16px;
-    padding: 16px;
-    border-radius: 14px;
+    padding: 14px;
+    border-radius: var(--r-3);
     background: var(--surface-2);
-    animation: pop-in 200ms var(--ease);
   }
   .field {
     margin-top: 18px;

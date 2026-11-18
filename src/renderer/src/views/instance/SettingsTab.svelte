@@ -47,7 +47,7 @@
 
 <div class="scroll">
   <div class="cols">
-    <section class="card">
+    <section class="panel">
       <h3>General</h3>
       <div class="field">
         <label class="label" for="inst-name">Name</label>
@@ -75,12 +75,12 @@
       </div>
     </section>
 
-    <section class="card">
+    <section class="panel">
       <h3>Game version</h3>
       <VersionPicker bind:value={version} />
       {#if versionChanged}
         <div class="apply">
-          <button class="btn primary sm" onclick={applyVersion}><Icon name="Check" size={15} /> Use {version.mcVersion || 'this version'}{version.loader !== 'vanilla' ? ` with ${version.loader}` : ''}</button>
+          <button class="btn primary sm" onclick={applyVersion}>Use {version.mcVersion || 'this version'}{version.loader !== 'vanilla' ? ` with ${version.loader}` : ''}</button>
           <button class="btn sm ghost" onclick={() => (version = { versionId: inst.versionId, loader: inst.loader, mcVersion: inst.mcVersion, loaderVersion: inst.loaderVersion, installed: inst.versionInstalled })}>Cancel</button>
         </div>
       {/if}
@@ -90,32 +90,32 @@
       <p class="hint mt">Launcher version id: <code class="selectable">{inst.versionId}</code></p>
     </section>
 
-    <section class="card">
+    <section class="panel">
       <h3>Memory</h3>
       <div class="mem">
         <input type="range" min="1024" max={systemGb * 1024} step="512" bind:value={memoryMb} onchange={() => save({ memoryMb }, `Memory set to ${memory(memoryMb)}`)} style:--p="{((memoryMb - 1024) / (systemGb * 1024 - 1024)) * 100}%" />
         <span class="mem-val">{memory(memoryMb)}</span>
       </div>
-      <p class="hint">2–4 GB suits vanilla and light packs; big modpacks often want 6–8 GB. More isn't always faster.</p>
+      <p class="hint">Vanilla and small packs run well on 2 to 4 GB. Big modpacks usually want 6 to 8 GB. Giving more than that rarely helps.</p>
       <div class="field mt">
         <label class="label" for="inst-jvm">Extra Java arguments</label>
         <input id="inst-jvm" class="input mono" bind:value={extra} placeholder="Optional, e.g. -Dfml.readTimeout=180" onblur={() => extra !== (inst.extraJavaArgs ?? '') && save({ extraJavaArgs: extra }, 'Java arguments saved')} />
       </div>
     </section>
 
-    <section class="card">
+    <section class="panel">
       <h3>Manage</h3>
       <div class="manage">
-        <button class="btn" onclick={() => api.instances.openFolder(inst.id)}><Icon name="FolderOpen" size={16} /> Open instance folder</button>
-        <button class="btn" onclick={() => duplicate(inst)}><Icon name="Copy" size={16} /> Duplicate</button>
-        <button class="btn" onclick={() => exportInstance(inst)}><Icon name="Upload" size={16} /> Export as modpack</button>
+        <button class="btn" onclick={() => api.instances.openFolder(inst.id)}>Open instance folder</button>
+        <button class="btn" onclick={() => duplicate(inst)}>Duplicate</button>
+        <button class="btn" onclick={() => exportInstance(inst)}>Export as modpack</button>
       </div>
       <div class="danger-zone">
         <div>
           <strong>Delete instance</strong>
-          <p class="hint">Moves the folder to the trash and removes the launcher profile.</p>
+          <p class="hint">Moves the folder to the trash and removes its profile from the official launcher.</p>
         </div>
-        <button class="btn danger" onclick={() => remove(inst)}><Icon name="Trash2" size={16} /> Delete</button>
+        <button class="btn danger" onclick={() => remove(inst)}>Delete</button>
       </div>
       <p class="hint mt">Profile in the official launcher: <code class="selectable">{inst.profileId}</code></p>
     </section>
@@ -156,11 +156,11 @@
     gap: 12px;
     width: 100%;
     padding: 8px 12px 8px 8px;
-    border-radius: 12px;
+    border-radius: var(--r-2);
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
-    font-weight: 550;
+    font-weight: 500;
     text-align: left;
   }
   .icon-row span {
@@ -181,12 +181,8 @@
     font-family: var(--font-mono);
     font-size: 12px;
     padding: 1px 6px;
-    border-radius: 5px;
+    border-radius: var(--r-1);
     background: var(--surface-2);
-  }
-  .mono {
-    font-family: var(--font-mono);
-    font-size: 13px;
   }
   .mem {
     display: flex;
@@ -195,10 +191,10 @@
     margin-bottom: 10px;
   }
   .mem-val {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 20px;
-    min-width: 70px;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 15px;
+    min-width: 64px;
     text-align: right;
   }
   input[type='range'] {
@@ -211,12 +207,11 @@
   }
   input[type='range']::-webkit-slider-thumb {
     appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: white;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--r-1);
+    background: var(--surface);
     border: 2px solid var(--accent);
-    box-shadow: var(--shadow-sm);
     cursor: grab;
   }
   .manage {
@@ -230,8 +225,8 @@
     gap: 14px;
     justify-content: space-between;
     margin-top: 18px;
-    padding: 14px 16px;
-    border-radius: 12px;
+    padding: 12px 14px;
+    border-radius: var(--r-2);
     border: 1px solid color-mix(in oklab, var(--danger) 30%, var(--border));
     background: color-mix(in oklab, var(--danger) 5%, transparent);
   }

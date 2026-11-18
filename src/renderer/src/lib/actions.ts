@@ -12,8 +12,8 @@ export async function play(inst: Instance): Promise<void> {
     const loader = LOADERS[inst.loader]?.label ?? 'The mod loader'
     const choice = await confirm({
       title: `${loader} isn't installed yet`,
-      body: `"${inst.versionId}" is not in the launcher's versions folder, so the launcher can't start it. Open the instance's Settings tab for install steps, or play anyway.`,
-      confirm: 'Show me how',
+      body: `The launcher can't start "${inst.versionId}" until it's installed. The Settings tab has the steps.`,
+      confirm: 'Show the steps',
       alt: 'Play anyway'
     })
     if (choice === 'confirm') return navigate({ view: 'instance', id: inst.id, tab: 'settings' })
@@ -32,7 +32,7 @@ export async function play(inst: Instance): Promise<void> {
   await refreshLauncher()
 }
 
-export async function togglePin(inst: Instance): Promise<void> {
+async function togglePin(inst: Instance): Promise<void> {
   const updated = await attempt(() => api.instances.update(inst.id, { pinned: !inst.pinned }))
   if (updated) replaceInstance(updated)
 }
@@ -57,7 +57,7 @@ export async function duplicate(inst: Instance): Promise<void> {
 export async function remove(inst: Instance): Promise<void> {
   const choice = await confirm({
     title: `Delete "${inst.name}"?`,
-    body: 'The instance folder (mods, worlds, screenshots…) goes to the trash, and its profile is removed from the official launcher.',
+    body: 'Its folder goes to the trash, including worlds and screenshots, and its profile is removed from the official launcher.',
     confirm: 'Delete',
     danger: true
   })

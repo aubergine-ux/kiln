@@ -19,8 +19,8 @@
   async function detect() {
     detecting = true
     const d = await attempt(() => api.setup.detect())
-    // A short pause so the check feels deliberate rather than flickering.
-    await new Promise((r) => setTimeout(r, 450))
+    // Without a short pause the spinner flashes for a few milliseconds, which reads as a glitch.
+    await new Promise((r) => setTimeout(r, 400))
     detecting = false
     if (!d) return
     detection = d
@@ -64,44 +64,39 @@
 
   const isMac = window.kiln.platform === 'darwin'
   const isWin = window.kiln.platform === 'win32'
-  const STEPS = ['Welcome', 'Find the launcher', 'Make it yours']
+  const STEPS = ['Welcome', 'Launcher', 'Look']
 </script>
 
 <div class="setup">
   <div class="drag drag-region"></div>
-  <div class="glow"></div>
 
   <div class="panel">
     <div class="steps">
       {#each STEPS as s, i (s)}
-        <span class:done={i < step} class:on={i === step}><b>{i < step ? '✓' : i + 1}</b> {s}</span>
+        <span class:done={i < step} class:on={i === step}><b>{#if i < step}<Icon name="Check" size={12} />{:else}{i + 1}{/if}</b> {s}</span>
       {/each}
     </div>
 
     {#key step}
-      <div class="content" in:fly={{ x: 30, duration: 260, delay: 80 }}>
+      <div class="content" in:fly={{ x: 16, duration: 180 }}>
         {#if step === 0}
           <div class="welcome">
-            <div class="logo-wrap"><Logo size={96} /></div>
+            <Logo size={88} />
             <h1>Welcome to Kiln</h1>
-            <p class="lead">Keep every modded setup separate, tidy and one click away. Kiln manages your instances, mods, packs and worlds, then hands off to the official launcher to sign in and play.</p>
-            <ul class="points">
-              <li><Icon name="Layers" size={18} /> Separate instances with their own mods, worlds and settings</li>
-              <li><Icon name="Play" size={18} /> Play opens the official launcher with the right profile selected</li>
-              <li><Icon name="Shield" size={18} /> No accounts, no API keys. Only the launcher's profiles file is touched, and it's backed up first</li>
-            </ul>
-            <button class="btn primary lg" onclick={next}>Get started <Icon name="ArrowRight" size={18} /></button>
+            <p class="lead">Kiln keeps a separate game folder for each of your setups and opens the official launcher when you want to play. It never asks for your account.</p>
+            <p class="lead small-print">In the launcher's folder, Kiln only ever changes launcher_profiles.json, and it copies that file to a backup first.</p>
+            <button class="btn primary lg" onclick={next}>Continue </button>
           </div>
         {:else if step === 1}
-          <h2>Let's find your game</h2>
-          <p class="lead small">Kiln works alongside the official launcher. Here's what we found on this computer.</p>
+          <h2>Find the official launcher</h2>
+          <p class="lead small">Kiln uses it to sign in and play. This is what Kiln found on this computer.</p>
 
           <div class="check" class:ok={!!launcher} class:bad={!launcher && !detecting}>
             <div class="state">
               {#if detecting}<Icon name="LoaderCircle" size={22} class="spin" />{:else if launcher}<Icon name="CircleCheck" size={22} />{:else}<Icon name="CircleAlert" size={22} />{/if}
             </div>
             <div class="check-body">
-              <strong>{detecting ? 'Looking for the official launcher…' : launcher ? 'Official launcher found' : 'Official launcher not found'}</strong>
+              <strong>{detecting ? 'Looking for the official launcher' : launcher ? 'Official launcher found' : 'Official launcher not found'}</strong>
               {#if launcher}
                 <code class="selectable">{launcher.kind === 'store' ? 'Microsoft Store app' : launcher.kind === 'flatpak' ? `Flatpak: ${launcher.path}` : launcher.path}</code>
                 {#if detection && detection.launchers.length > 1}
@@ -111,12 +106,12 @@
                 {/if}
               {:else if !detecting}
                 <p>
-                  Here's how to fix it: install the official launcher from minecraft.net{isWin ? ' (or the Microsoft Store)' : isMac ? ' and move it to Applications' : ' (the .deb, the Arch package, or the Flatpak)'}, open it once, then click “Detect again”.
-                  {#if !isWin && !isMac}If it's installed somewhere unusual, point Kiln at it with “Browse”.{/if}
+                  Install it from minecraft.net{isWin ? ' or the Microsoft Store' : isMac ? ' and move it to Applications' : ''}, open it once, then click Detect again.
+                  {#if !isWin && !isMac}If it lives somewhere unusual, use Browse to point Kiln at it.{/if}
                 </p>
                 <div class="row">
                   <button class="btn sm primary" onclick={() => api.shell.openExternal('https://www.minecraft.net/download')}><Icon name="ExternalLink" size={14} /> Get the launcher</button>
-                  <button class="btn sm" onclick={detect}><Icon name="RefreshCw" size={14} /> Detect again</button>
+                  <button class="btn sm" onclick={detect}>Detect again</button>
                   <button class="btn sm ghost" onclick={browseLauncher}>Browse…</button>
                 </div>
               {/if}
@@ -129,10 +124,10 @@
               {#if detecting}<Icon name="LoaderCircle" size={22} class="spin" />{:else if minecraftFound}<Icon name="CircleCheck" size={22} />{:else}<Icon name="CircleAlert" size={22} />{/if}
             </div>
             <div class="check-body">
-              <strong>{minecraftFound ? 'Game folder found' : detecting ? 'Looking for the game folder…' : 'Game folder not found yet'}</strong>
+              <strong>{minecraftFound ? 'Game folder found' : detecting ? 'Looking for the game folder' : 'Game folder not found yet'}</strong>
               <code class="selectable">{minecraftDir}</code>
               {#if !minecraftFound && !detecting}
-                <p>The official launcher creates this folder the first time it runs. Open the launcher once, then click “Detect again”, or choose the folder yourself.</p>
+                <p>The launcher creates this folder the first time it runs. Open it once and click Detect again, or pick the folder yourself.</p>
               {/if}
             </div>
             <button class="btn sm ghost" onclick={browseGameDir}>{minecraftFound ? 'Change' : 'Browse…'}</button>
@@ -143,27 +138,23 @@
             <div class="check-body">
               <strong>Kiln's instances folder</strong>
               <code class="selectable">{dataDir}</code>
-              <p>Every instance gets its own game folder in here.</p>
+              <p>Each instance gets its own folder in here.</p>
             </div>
             <button class="btn sm ghost" onclick={browseDataDir}>Change</button>
           </div>
 
           <div class="nav">
             <button class="btn ghost" onclick={() => step--}>Back</button>
-            <button class="btn primary" disabled={detecting} onclick={next}>{launcher && minecraftFound ? 'Continue' : 'Continue anyway'} <Icon name="ArrowRight" size={16} /></button>
+            <button class="btn primary" disabled={detecting} onclick={next}>{launcher && minecraftFound ? 'Continue' : 'Continue anyway'} </button>
           </div>
         {:else}
-          <h2>Make it yours</h2>
-          <p class="lead small">Pick a look. You can change this any time in Settings.</p>
+          <h2>Pick a look</h2>
+          <p class="lead small">You can change this later in Settings.</p>
           <ThemePicker />
-          <div class="tips">
-            <span><span class="kbd">{isMac ? '⌘' : 'Ctrl'}</span><span class="kbd">K</span> search</span>
-            <span><span class="kbd">{isMac ? '⌘' : 'Ctrl'}</span><span class="kbd">N</span> new instance</span>
-            <span><span class="kbd">?</span> all shortcuts</span>
-          </div>
+          <p class="tip">Press <span class="kbd">?</span> any time to see the keyboard shortcuts.</p>
           <div class="nav">
             <button class="btn ghost" onclick={() => step--}>Back</button>
-            <button class="btn primary lg" onclick={finish}><Icon name="Flame" size={18} /> Start using Kiln</button>
+            <button class="btn primary lg" onclick={finish}>Done</button>
           </div>
         {/if}
       </div>
@@ -179,7 +170,7 @@
     inset: 0;
     display: grid;
     place-items: center;
-    background: var(--bg);
+    background: var(--bg-sunken);
     overflow: auto;
   }
   .drag {
@@ -189,23 +180,15 @@
     right: 0;
     height: 44px;
   }
-  .glow {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(700px 400px at 15% 0%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 70%),
-      radial-gradient(600px 400px at 100% 100%, color-mix(in oklab, var(--accent-2) 14%, transparent), transparent 70%);
-    pointer-events: none;
-  }
   .panel {
     position: relative;
-    width: min(640px, calc(100vw - 48px));
+    width: min(600px, calc(100vw - 48px));
     margin: 60px 0 30px;
-    padding: 28px 36px 24px;
-    border-radius: 28px;
+    padding: 26px 32px 22px;
+    border-radius: var(--r-4);
     background: var(--surface);
     border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-pop);
   }
   .steps {
     display: flex;
@@ -221,11 +204,12 @@
     gap: 7px;
   }
   .steps b {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--r-1);
     display: grid;
     place-items: center;
+    font-family: var(--font-mono);
     font-size: 11px;
     background: var(--surface-3);
   }
@@ -238,80 +222,59 @@
     color: white;
   }
   .welcome {
-    text-align: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
-  .logo-wrap {
-    animation: float 3s ease-in-out infinite alternate;
-    margin-bottom: 18px;
+  .welcome h1 {
+    margin-top: 20px;
   }
-  @keyframes float {
-    to { transform: translateY(-6px) rotate(-2deg); }
+  .welcome .btn {
+    margin-top: 24px;
   }
   h1 {
-    font-size: 34px;
+    font-size: 32px;
   }
   h2 {
-    font-size: 26px;
+    font-size: 24px;
   }
   .lead {
     color: var(--text-2);
     font-size: 15px;
     line-height: 1.6;
-    margin: 10px 0 0;
-    max-width: 520px;
+    margin-top: 10px;
+    max-width: 500px;
   }
   .lead.small {
     font-size: 14px;
-    margin-bottom: 20px;
+    margin: 6px 0 18px;
   }
-  .points {
-    list-style: none;
-    padding: 0;
-    margin: 22px 0 26px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .points li {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    color: var(--text-2);
-  }
-  .points :global(.icon) {
-    color: var(--accent-text);
-    margin-top: 1px;
+  .small-print {
+    font-size: 13.5px;
+    color: var(--muted);
   }
   .check {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     align-items: flex-start;
-    padding: 16px;
-    border-radius: 16px;
+    padding: 14px;
+    border-radius: var(--r-3);
     border: 1px solid var(--border);
+    border-left-width: 3px;
     background: var(--surface-2);
-    margin-bottom: 10px;
-    transition: border-color var(--med), background var(--med);
+    margin-bottom: 8px;
   }
   .check.ok {
-    border-color: color-mix(in oklab, var(--ok) 35%, var(--border));
+    border-left-color: var(--ok);
   }
   .check.ok .state {
     color: var(--ok);
   }
   .check.bad {
-    border-color: color-mix(in oklab, var(--danger) 35%, var(--border));
-    background: color-mix(in oklab, var(--danger) 5%, var(--surface-2));
+    border-left-color: var(--danger);
   }
   .check.bad .state {
     color: var(--danger);
-  }
-  .neutral .state {
-    color: var(--muted);
   }
   .state {
     margin-top: 1px;
@@ -322,7 +285,7 @@
     min-width: 0;
   }
   .check-body strong {
-    font-weight: 650;
+    font-weight: 600;
   }
   .check-body p {
     font-size: 13px;
@@ -332,9 +295,9 @@
   }
   code {
     display: block;
-    margin-top: 4px;
+    margin-top: 3px;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--muted);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -342,7 +305,7 @@
   }
   .sm-select {
     margin-top: 8px;
-    height: 32px;
+    height: 30px;
     width: auto;
   }
   .row {
@@ -356,22 +319,14 @@
     justify-content: space-between;
     margin-top: 24px;
   }
-  .tips {
-    display: flex;
-    gap: 18px;
-    margin-top: 22px;
-    font-size: 12.5px;
+  .tip {
+    margin-top: 18px;
+    font-size: 13px;
     color: var(--muted);
   }
-  .tips > span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
   .foot {
-    margin-top: 24px;
-    padding-top: 16px;
+    margin-top: 22px;
+    padding-top: 14px;
     border-top: 1px solid var(--border);
-    text-align: center;
   }
 </style>

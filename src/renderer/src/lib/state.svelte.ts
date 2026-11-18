@@ -19,8 +19,7 @@ export const app = $state({
   search: '',
   /** Home screen: only show this folder (null = all). */
   folder: null as string | null,
-  progress: {} as Record<string, Progress>,
-  dark: false
+  progress: {} as Record<string, Progress>
 })
 
 export function navigate(route: Route): void {
@@ -37,8 +36,6 @@ export const current = {
     return r.view === 'instance' ? app.instances.find((i) => i.id === r.id) : undefined
   }
 }
-
-// ---------- Toasts ----------
 
 export interface Toast {
   id: number
@@ -63,7 +60,7 @@ export function dismissToast(id: number): void {
 }
 
 /** Show an error from any failed action, with its "how to fix" hint. */
-export function showError(err: unknown, title?: string): void {
+function showError(err: unknown, title?: string): void {
   const e = err as ApiError
   toast('error', title ?? e.message ?? 'Something went wrong', title ? e.message + (e.hint ? `\n${e.hint}` : '') : e.hint)
 }
@@ -77,8 +74,6 @@ export async function attempt<T>(fn: () => Promise<T>, errorTitle?: string): Pro
     return undefined
   }
 }
-
-// ---------- Confirm dialogs ----------
 
 export interface ConfirmRequest {
   title: string
@@ -103,8 +98,6 @@ export function confirm(opts: Omit<ConfirmRequest, 'resolve'>): Promise<'confirm
     }
   })
 }
-
-// ---------- Loading data ----------
 
 let refreshing: Promise<void> | null = null
 let again = false

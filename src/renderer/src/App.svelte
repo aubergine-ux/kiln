@@ -35,7 +35,6 @@
   })
 
   $effect(() => {
-    // Re-apply whenever theme settings change.
     void app.settings?.theme
     void app.settings?.accent
     void app.settings?.reduceMotion
@@ -104,7 +103,7 @@
       <Sidebar />
       <main>
         {#key app.route.view === 'instance' ? `i:${app.route.id}` : app.route.view}
-          <div class="view" in:fade={{ duration: 160 }}>
+          <div class="view" in:fade={{ duration: 120 }}>
             {#if app.route.view === 'home'}
               <Home />
             {:else if app.route.view === 'instance'}
@@ -127,12 +126,12 @@
     {#if dragging}
       <div class="drop-overlay" transition:fade={{ duration: 120 }}>
         <div class="drop-card">
-          <div class="drop-icon"><Icon name="Download" size={30} /></div>
-          <h2>{current.instance ? `Drop to add to ${current.instance.name}` : 'Drop a modpack to import it'}</h2>
+          <Icon name="Download" size={28} />
+          <h2>{current.instance ? `Add to ${current.instance.name}` : 'Import a modpack'}</h2>
           <p>
             {current.instance
-              ? 'Mods, resource packs, shader packs, data packs and worlds go to the right place automatically.'
-              : 'Modrinth .mrpack and CurseForge .zip files work. To add mods, drop them on an instance card.'}
+              ? 'Kiln looks inside each file and puts it in the right folder.'
+              : 'Drop a .mrpack or CurseForge .zip here. To add mods, drop them on an instance instead.'}
           </p>
         </div>
       </div>
@@ -163,41 +162,30 @@
   }
   .drop-overlay {
     position: fixed;
-    inset: 10px;
-    border-radius: 22px;
-    border: 2.5px dashed var(--accent);
-    background: color-mix(in oklab, var(--bg) 82%, transparent);
-    backdrop-filter: blur(8px);
+    inset: 8px;
+    border-radius: var(--r-4);
+    border: 2px dashed var(--accent);
+    background: color-mix(in oklab, var(--bg) 92%, transparent);
     display: grid;
     place-items: center;
     z-index: 150;
     pointer-events: none;
   }
   .drop-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    max-width: 420px;
-    animation: pop-in 200ms var(--ease);
-  }
-  .drop-icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 16px;
-    border-radius: 22px;
-    display: grid;
-    place-items: center;
-    color: white;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow: 0 10px 30px color-mix(in oklab, var(--accent) 40%, transparent);
-    animation: bob 1.4s var(--ease) infinite alternate;
-  }
-  @keyframes bob {
-    to { transform: translateY(-6px); }
+    max-width: 400px;
+    color: var(--accent-text);
   }
   .drop-card h2 {
     font-size: 22px;
+    margin-top: 12px;
+    color: var(--text);
   }
   .drop-card p {
-    margin-top: 8px;
+    margin-top: 6px;
     color: var(--text-2);
   }
 </style>

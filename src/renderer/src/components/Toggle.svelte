@@ -20,30 +20,29 @@
 
 <style>
   .toggle {
-    width: 40px;
-    height: 24px;
+    width: 36px;
+    height: 20px;
     border-radius: 99px;
     border: none;
     padding: 0;
-    background: var(--surface-3);
+    background: var(--border-strong);
     position: relative;
     flex-shrink: 0;
     transition: background var(--med) var(--ease);
-    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.08);
   }
   .toggle.on {
-    background: var(--accent);
+    background: var(--text-2);
   }
   .knob {
     position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 18px;
-    height: 18px;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: white;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
-    transition: transform var(--med) var(--ease-spring);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+    transition: transform var(--med) var(--ease);
   }
   .on .knob {
     transform: translateX(16px);

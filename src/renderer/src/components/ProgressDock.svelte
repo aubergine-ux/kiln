@@ -7,7 +7,7 @@
 </script>
 
 {#if jobs.length}
-  <div class="dock" transition:fly={{ y: 20, duration: 200 }}>
+  <div class="dock" transition:fly={{ y: 10, duration: 160 }}>
     {#each jobs as p (p.task)}
       <div class="job">
         <Icon name="LoaderCircle" size={18} class="spin" />
@@ -31,20 +31,20 @@
     left: calc(var(--sidebar) + 20px);
     bottom: 20px;
     z-index: 250;
-    width: 360px;
+    width: 340px;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
   .job {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
-    padding: 12px 14px;
-    border-radius: 14px;
+    padding: 11px 12px;
+    border-radius: var(--r-3);
     background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-pop);
     color: var(--accent-text);
   }
   .info {
@@ -63,22 +63,22 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-weight: 550;
+    font-weight: 600;
   }
   .count {
     color: var(--muted);
-    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+    font-size: 12px;
   }
   .bar {
-    height: 6px;
+    height: 5px;
     border-radius: 99px;
     background: var(--surface-3);
     overflow: hidden;
   }
   .fill {
     height: 100%;
-    border-radius: inherit;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    background: var(--accent);
     transition: width 200ms var(--ease);
   }
   .indeterminate .fill {

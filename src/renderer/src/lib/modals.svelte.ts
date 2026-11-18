@@ -5,7 +5,6 @@ export type Modal =
   | { kind: 'import'; file?: string }
   | { kind: 'export'; instance: Instance }
   | { kind: 'shortcuts' }
-  | { kind: 'rename'; instance: Instance }
   | { kind: 'icon'; instance: Instance }
   | { kind: 'folder'; rename?: string }
 

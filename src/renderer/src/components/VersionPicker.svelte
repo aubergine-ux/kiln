@@ -111,7 +111,7 @@
     </select>
   {:else}
     <input class="input" placeholder="Game version, e.g. 1.21.1" value={custom} oninput={(e) => planLoader((e.currentTarget as HTMLInputElement).value)} list="mc-versions" />
-    <p class="hint mt-s note"><Icon name="Info" size={14} /> {LOADERS[loader].label} isn't installed for this version yet. After creating, Kiln shows how to run the official installer and picks it up automatically.</p>
+    <p class="hint mt-s note"><Icon name="Info" size={14} /> {LOADERS[loader].label} isn't installed for this version yet. Kiln will show you how to install it and switch over once it's done.</p>
   {/if}
 
   <datalist id="mc-versions">
@@ -127,30 +127,28 @@
   .loaders,
   .modes {
     display: flex;
-    gap: 4px;
-    padding: 3px;
-    border-radius: 12px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    gap: 2px;
+    padding: 2px;
+    border-radius: var(--r-2);
+    background: var(--surface-3);
     margin-bottom: 10px;
   }
   .loaders button,
   .modes button {
     flex: 1;
-    height: 32px;
+    height: 30px;
     border: none;
-    border-radius: 9px;
+    border-radius: var(--r-1);
     background: none;
-    color: var(--muted);
+    color: var(--text-2);
     font-weight: 600;
     font-size: 13px;
-    transition: background var(--fast), color var(--fast);
   }
   .loaders button.on,
   .modes button.on {
     background: var(--surface);
     color: var(--text);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow);
   }
   .modes {
     background: none;

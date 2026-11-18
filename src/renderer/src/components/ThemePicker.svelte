@@ -9,11 +9,11 @@
     { id: 'dark', label: 'Dark', icon: 'Moon' }
   ]
   const ACCENTS: { id: Accent; label: string; color: string }[] = [
-    { id: 'ember', label: 'Ember', color: '#e5602f' },
-    { id: 'moss', label: 'Moss', color: '#4f9a4a' },
-    { id: 'sky', label: 'Sky', color: '#2f80e0' },
-    { id: 'violet', label: 'Violet', color: '#7c5ce0' },
-    { id: 'rose', label: 'Rose', color: '#dc4778' }
+    { id: 'ember', label: 'Ember', color: '#d4531c' },
+    { id: 'moss', label: 'Moss', color: '#4d7c38' },
+    { id: 'sky', label: 'Lapis', color: '#2e5ea8' },
+    { id: 'violet', label: 'Amethyst', color: '#77519f' },
+    { id: 'rose', label: 'Clay', color: '#b04a35' }
   ]
 </script>
 
@@ -42,24 +42,20 @@
   .themes {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 8px;
   }
   .themes button {
-    padding: 8px 8px 10px;
-    border-radius: 14px;
-    border: 1.5px solid var(--border);
+    padding: 6px 6px 8px;
+    border-radius: var(--r-3);
+    border: 1px solid var(--border);
     background: var(--surface);
     display: flex;
     flex-direction: column;
     gap: 8px;
-    transition: border-color var(--fast), transform var(--fast);
-  }
-  .themes button:hover {
-    transform: translateY(-1px);
   }
   .themes button.on {
     border-color: var(--accent);
-    box-shadow: var(--focus);
+    box-shadow: 0 0 0 1px var(--accent);
   }
   .themes span {
     display: inline-flex;
@@ -70,8 +66,8 @@
     font-size: 13px;
   }
   .preview {
-    height: 64px;
-    border-radius: 9px;
+    height: 60px;
+    border-radius: var(--r-2);
     display: flex;
     overflow: hidden;
     border: 1px solid var(--border);
@@ -82,50 +78,53 @@
   .pv-main {
     flex: 1;
     display: flex;
-    gap: 5px;
+    flex-direction: column;
+    gap: 4px;
     padding: 8px;
   }
   .pv-card {
     flex: 1;
-    border-radius: 5px;
+    border-radius: 2px;
   }
-  .light { background: #faf7f2; }
-  .light .pv-side { background: #f2ede5; }
-  .light .pv-card { background: #fff; border: 1px solid #e6ddd0; }
-  .dark { background: #15110e; }
-  .dark .pv-side { background: #100d0a; }
-  .dark .pv-card { background: #1e1915; border: 1px solid #342b24; }
-  .system { background: linear-gradient(90deg, #faf7f2 50%, #15110e 50%); }
-  .system .pv-side { background: #f2ede5; }
-  .system .pv-card:first-child { background: #fff; border: 1px solid #e6ddd0; }
-  .system .pv-card:last-child { background: #1e1915; border: 1px solid #342b24; }
+  .light { background: #f2efe9; }
+  .light .pv-side { background: #e8e3db; }
+  .light .pv-card { background: #fbfaf7; border: 1px solid #ddd5c9; }
+  .dark { background: #1a1815; }
+  .dark .pv-side { background: #141210; }
+  .dark .pv-card { background: #221f1b; border: 1px solid #36302a; }
+  .system { background: linear-gradient(90deg, #f2efe9 50%, #1a1815 50%); }
+  .system .pv-side { background: #e8e3db; }
+  .system .pv-card:first-child { background: #fbfaf7; border: 1px solid #ddd5c9; }
+  .system .pv-card:last-child { background: #221f1b; border: 1px solid #36302a; }
   .accents {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
+    gap: 6px;
+    margin-top: 12px;
   }
   .accents button {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: 36px;
-    padding: 0 14px 0 8px;
-    border-radius: 99px;
-    border: 1.5px solid var(--border);
+    height: 32px;
+    padding: 0 12px 0 6px;
+    border-radius: var(--r-2);
+    border: 1px solid var(--border);
     background: var(--surface);
     font-weight: 600;
     font-size: 13px;
   }
   .accents button.on {
     border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
   }
   .dot {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--r-1);
     display: grid;
     place-items: center;
     color: white;
+    box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.2);
   }
 </style>

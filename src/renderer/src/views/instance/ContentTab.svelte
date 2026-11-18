@@ -22,7 +22,7 @@
       many: 'mods',
       icon: 'Puzzle',
       empty: 'No mods yet',
-      body: 'Drag .jar files here, or click “Add mods”. Dropping a newer version of a mod replaces the old one.',
+      body: 'Drag .jar files here or click Add mods. A newer version of a mod you already have replaces the old file.',
       ext: ['jar'],
       folder: 'mods'
     },
@@ -31,16 +31,16 @@
       many: 'resource packs',
       icon: 'Palette',
       empty: 'No resource packs yet',
-      body: 'Drag resource pack .zip files here. Turn them on in the game under Options → Resource Packs.',
+      body: 'Drag .zip files here, then turn them on in the game under Options, Resource Packs.',
       ext: ['zip'],
       folder: 'resourcepacks'
     },
     shaderpacks: {
       one: 'shader pack',
       many: 'shader packs',
-      icon: 'Sparkles',
+      icon: 'Aperture',
       empty: 'No shader packs yet',
-      body: 'Drag shader .zip files here. You will need a shader mod such as Iris or OptiFine to use them.',
+      body: 'Drag .zip files here. Shaders also need a shader mod such as Iris or OptiFine.',
       ext: ['zip'],
       folder: 'shaderpacks'
     },
@@ -49,7 +49,7 @@
       many: 'data packs',
       icon: 'Package',
       empty: 'No data packs in this world',
-      body: 'Drag data pack .zip files here to add them to the selected world.',
+      body: 'Drag .zip files here to add them to the world picked above.',
       ext: ['zip'],
       folder: 'saves'
     }
@@ -176,37 +176,37 @@
     <button class:on={show === 'off'} onclick={() => (show = 'off')}>Disabled {#if disabledCount}<span>{disabledCount}</span>{/if}</button>
   </div>
   <div class="spacer"></div>
-  <button class="btn" disabled={kind === 'datapacks' && !world} onclick={() => api.instances.openFolder(inst.id, kind === 'datapacks' ? `saves/${world}/datapacks` : copy.folder)}><Icon name="FolderOpen" size={16} /> Open folder</button>
-  <button class="btn primary" disabled={kind === 'datapacks' && !world} onclick={add}><Icon name="Plus" size={16} stroke={2.4} /> Add {copy.many}</button>
+  <button class="btn" disabled={kind === 'datapacks' && !world} onclick={() => api.instances.openFolder(inst.id, kind === 'datapacks' ? `saves/${world}/datapacks` : copy.folder)}>Open folder</button>
+  <button class="btn primary" disabled={kind === 'datapacks' && !world} onclick={add}><Icon name="Plus" size={16} /> Add {copy.many}</button>
 </div>
 
 <div class="list-wrap">
   {#if kind === 'mods' && inst.loader === 'vanilla' && items.length > 0}
     <div class="note">
       <Icon name="Info" size={16} />
-      This instance runs vanilla, which can't load mods.
+      Vanilla can't load mods.
       <button class="link" onclick={() => navigate({ view: 'instance', id: inst.id, tab: 'settings' })}>Choose a mod loader</button>
     </div>
   {/if}
 
   {#if kind === 'datapacks' && !worlds.length && !loading}
-    <EmptyState icon="Globe" title="No worlds yet" body="Data packs are added to a single world. Play once to create a world, or add one on the Worlds tab." />
+    <EmptyState art="world" title="No worlds yet" body="Data packs live inside a world. Create one in the game or add one on the Worlds tab first." />
   {:else if !loading && items.length === 0}
-    <EmptyState icon={copy.icon} title={copy.empty} body={copy.body}>
+    <EmptyState art="crate" title={copy.empty} body={copy.body}>
       <button class="btn primary" onclick={add}><Icon name="Plus" size={16} /> Add {copy.many}</button>
       {#if kind === 'mods' && inst.loader === 'vanilla'}
         <button class="btn" onclick={() => navigate({ view: 'instance', id: inst.id, tab: 'settings' })}>Set up a mod loader</button>
       {/if}
     </EmptyState>
   {:else if !loading && filtered.length === 0}
-    <EmptyState icon="Search" title="No matches" body="Nothing here matches your search or filter.">
+    <EmptyState art="search" title="Nothing matches" body="Try another search, or show all {copy.many}.">
       <button class="btn" onclick={() => ((query = ''), (show = 'all'))}>Clear filters</button>
     </EmptyState>
   {:else}
-    <ul class="list">
+    <ul class="list panel">
       {#each filtered as item (item.file)}
-        <li class:off={!item.enabled} animate:flip={{ duration: 220 }} oncontextmenu={(e) => (e.preventDefault(), rowMenu(e, item))}>
-          <div class="thumb">
+        <li class:off={!item.enabled} animate:flip={{ duration: 160 }} oncontextmenu={(e) => (e.preventDefault(), rowMenu(e, item))}>
+          <div class="thumb slot">
             {#if item.iconUrl}<img src={item.iconUrl} alt="" draggable="false" />{:else}<Icon name={item.isFolder ? 'Folder' : copy.icon} size={22} stroke={1.7} />{/if}
           </div>
           <div class="text">
@@ -225,7 +225,7 @@
         </li>
       {/each}
     </ul>
-    <div class="dropzone"><Icon name="Download" size={16} /> Drag {copy.many} anywhere in this window to add them</div>
+    <p class="drop-hint">You can also drag {copy.many} anywhere onto this window.</p>
   {/if}
 </div>
 
@@ -233,25 +233,25 @@
   .toolbar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     padding: 16px 28px 12px;
     flex-wrap: wrap;
   }
   .search {
     display: flex;
     align-items: center;
-    gap: 8px;
-    height: 36px;
-    width: 240px;
-    padding: 0 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
+    gap: 7px;
+    height: 34px;
+    width: 230px;
+    padding: 0 10px;
+    border-radius: var(--r-2);
+    border: 1px solid var(--border-strong);
     background: var(--surface);
     color: var(--muted);
   }
   .search:focus-within {
     border-color: var(--accent);
-    box-shadow: var(--focus);
+    box-shadow: 0 0 0 3px var(--accent-soft);
   }
   .search input {
     flex: 1;
@@ -269,36 +269,35 @@
   }
   .world-pick select {
     width: 220px;
-    height: 36px;
+    height: 34px;
   }
   .seg {
     display: flex;
-    padding: 3px;
-    border-radius: 11px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    padding: 2px;
+    border-radius: var(--r-2);
+    background: var(--surface-3);
   }
   .seg button {
     height: 28px;
-    padding: 0 11px;
+    padding: 0 10px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--r-1);
     background: none;
-    color: var(--muted);
+    color: var(--text-2);
     font-weight: 600;
     font-size: 13px;
     display: inline-flex;
     gap: 6px;
     align-items: center;
-    transition: background var(--fast), color var(--fast);
   }
   .seg button.on {
     background: var(--surface);
     color: var(--text);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow);
   }
   .seg span {
-    font-size: 11.5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--muted);
   }
   .spacer {
@@ -313,10 +312,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 9px 12px;
     margin-bottom: 10px;
-    border-radius: 12px;
-    background: color-mix(in oklab, var(--info) 10%, var(--surface));
+    border-radius: var(--r-2);
+    background: color-mix(in oklab, var(--info) 9%, var(--surface));
     color: var(--text-2);
     font-size: 13px;
   }
@@ -331,67 +330,60 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    overflow: hidden;
   }
   li {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 12px 12px 14px;
-    border-radius: 14px;
+    gap: 12px;
+    padding: 8px 10px 8px 12px;
     background: var(--surface);
-    border: 1px solid var(--border);
-    transition: border-color var(--fast), box-shadow var(--fast), opacity var(--med);
-    animation: pop-in 260ms var(--ease) both;
+    transition: background var(--fast);
+  }
+  li + li {
+    border-top: 1px solid var(--border);
   }
   li:hover {
-    border-color: var(--border-strong);
-    box-shadow: var(--shadow-sm);
+    background: var(--surface-2);
   }
   li.off .thumb,
   li.off .text {
-    opacity: 0.5;
+    opacity: 0.45;
   }
   .thumb {
-    width: 46px;
-    height: 46px;
+    width: 40px;
+    height: 40px;
     flex-shrink: 0;
-    border-radius: 11px;
     display: grid;
     place-items: center;
-    overflow: hidden;
+    padding: 4px;
     color: var(--muted);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    transition: opacity var(--med);
   }
   .thumb img {
-    width: 100%;
-    height: 100%;
+    width: 32px;
+    height: 32px;
     object-fit: cover;
     image-rendering: pixelated;
   }
   .text {
     flex: 1;
     min-width: 0;
-    transition: opacity var(--med);
   }
   .line1 {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: 8px;
     min-width: 0;
   }
   .name {
-    font-weight: 650;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .ver {
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
     color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
@@ -401,29 +393,23 @@
   .desc {
     font-size: 13px;
     color: var(--text-2);
-    margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .file {
-    font-size: 11.5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--muted);
-    margin-top: 3px;
+    margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .dropzone {
-    margin-top: 14px;
-    padding: 16px;
-    border-radius: 14px;
-    border: 1.5px dashed var(--border-strong);
+  .drop-hint {
+    margin-top: 12px;
     color: var(--muted);
-    font-size: 13px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
+    font-size: 12.5px;
+    text-align: center;
   }
 </style>

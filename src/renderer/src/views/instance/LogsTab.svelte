@@ -57,7 +57,7 @@
     })
     const desc = text.match(/^Description: (.+)$/m)?.[1]
     const cause = text.match(/^([\w.$]+(?:Exception|Error)[^\n]*)$/m)?.[1]
-    crashSummary = file.startsWith('crash-reports/') ? [desc, cause].filter(Boolean).join(' — ') || null : null
+    crashSummary = file.startsWith('crash-reports/') ? [desc, cause].filter(Boolean).join(': ') || null : null
     matchIndex = 0
     scroller?.scrollTo({ top: file.startsWith('crash') ? 0 : lines.length * LINE })
   }
@@ -81,7 +81,6 @@
   }
 
   $effect(() => {
-    // Jump to the first match while typing.
     void q
     matchIndex = 0
     if (matches.length) scroller?.scrollTo({ top: matches[0] * LINE - viewHeight / 2 })
@@ -125,7 +124,7 @@
 <svelte:window {onkeydown} />
 
 {#if !loading && files.length === 0}
-  <EmptyState icon="ScrollText" title="No logs yet" body="Logs and crash reports appear here after you play this instance. They help track down problems with mods." />
+  <EmptyState art="scroll" title="No logs yet" body="Logs and crash reports show up here after you play this instance." />
 {:else}
   <div class="layout">
     <aside>
@@ -134,7 +133,7 @@
           <Icon name={f.kind === 'crash' ? 'Bug' : 'FileText'} size={16} />
           <div>
             <span class="fname">{f.file.split('/').pop()}</span>
-            <span class="fmeta">{timeAgo(f.modified)} · {bytes(f.size)}</span>
+            <span class="fmeta">{timeAgo(f.modified)}, {bytes(f.size)}</span>
           </div>
         </button>
       {/each}
@@ -155,8 +154,8 @@
           <button class="lvl error" class:on={levels.error} onclick={() => (levels.error = !levels.error)}>Errors <span>{counts.error}</span></button>
         </div>
         <div class="spacer"></div>
-        {#if counts.error}<button class="btn sm" onclick={firstError}><Icon name="CircleAlert" size={15} /> First error</button>{/if}
-        <button class="btn sm" onclick={copyAll}><Icon name="Copy" size={15} /> Copy</button>
+        {#if counts.error}<button class="btn sm" onclick={firstError}>First error</button>{/if}
+        <button class="btn sm" onclick={copyAll}>Copy</button>
         <button class="btn sm icon" title="Open in text editor" aria-label="Open in text editor" onclick={() => selected && api.shell.openPath(`${inst.gameDir}/${selected}`)}><Icon name="ExternalLink" size={15} /></button>
       </div>
 
@@ -198,9 +197,9 @@
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    padding: 9px 10px;
+    padding: 8px 10px;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--r-2);
     background: none;
     text-align: left;
     color: var(--text-2);
@@ -218,7 +217,7 @@
   }
   .file.active {
     background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    box-shadow: inset 0 0 0 1px var(--border);
     color: var(--text);
   }
   .file.crash :global(.icon) {
@@ -241,7 +240,7 @@
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--r-3);
     background: var(--surface);
     overflow: hidden;
   }
@@ -251,23 +250,23 @@
     gap: 10px;
     padding: 10px;
     border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
   }
   .search {
     display: flex;
     align-items: center;
     gap: 6px;
     height: 32px;
-    width: 280px;
+    flex: 0 1 260px;
+    min-width: 150px;
     padding: 0 4px 0 10px;
-    border-radius: 9px;
-    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    border: 1px solid var(--border-strong);
     background: var(--bg);
     color: var(--muted);
   }
   .search:focus-within {
     border-color: var(--accent);
-    box-shadow: var(--focus);
+    box-shadow: 0 0 0 3px var(--accent-soft);
   }
   .search input {
     flex: 1;
@@ -278,8 +277,8 @@
     user-select: text;
   }
   .mcount {
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
   }
   .levels {
     display: flex;
@@ -287,8 +286,8 @@
   }
   .lvl {
     height: 28px;
-    padding: 0 10px;
-    border-radius: 8px;
+    padding: 0 9px;
+    border-radius: var(--r-2);
     border: 1px solid var(--border);
     background: none;
     color: var(--muted);
@@ -308,7 +307,8 @@
   }
   .lvl span {
     margin-left: 3px;
-    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+    font-size: 11px;
   }
   .spacer {
     flex: 1;
@@ -328,7 +328,7 @@
     flex: 1;
     overflow: auto;
     font-family: var(--font-mono);
-    font-size: 12.5px;
+    font-size: 12px;
     background: var(--bg);
   }
   .line {
@@ -367,7 +367,7 @@
   }
   .line.current {
     box-shadow: inset 3px 0 0 var(--accent);
-    background: var(--accent-softer);
+    background: var(--accent-soft);
   }
   mark {
     background: color-mix(in oklab, var(--accent) 35%, transparent);

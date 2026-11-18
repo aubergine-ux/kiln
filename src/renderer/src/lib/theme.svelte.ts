@@ -6,7 +6,6 @@ export function applyTheme(): void {
   if (!s) return
   const media = window.matchMedia('(prefers-color-scheme: dark)')
   const dark = s.theme === 'dark' || (s.theme === 'system' && media.matches)
-  app.dark = dark
   const root = document.documentElement
   root.dataset.theme = dark ? 'dark' : 'light'
   root.dataset.accent = s.accent

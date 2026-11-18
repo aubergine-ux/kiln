@@ -27,7 +27,7 @@
     if (!d) return
     found = d.launchers
     if (d.launchers.length && !app.launcher?.launcherFound) await useLauncher(d.launchers[0])
-    else if (!d.launchers.length) toast('warn', 'No official launcher found', 'Install it from minecraft.net/download, open it once, then try again. Or use “Browse…”.')
+    else if (!d.launchers.length) toast('warn', 'No official launcher found', 'Install it from minecraft.net, open it once, then click Detect. You can also use Browse.')
   }
 
   async function useLauncher(c: LauncherCandidate) {
@@ -61,8 +61,8 @@
 
 <div class="scroll">
   <div class="wrap">
-    <section class="card">
-      <h3><Icon name="Palette" size={18} /> Appearance</h3>
+    <section class="panel">
+      <h3>Appearance</h3>
       <ThemePicker />
       <div class="row-setting">
         <div>
@@ -73,21 +73,21 @@
       </div>
     </section>
 
-    <section class="card">
-      <h3><Icon name="Play" size={18} /> Official launcher</h3>
+    <section class="panel">
+      <h3>Official launcher</h3>
       <div class="status" class:ok={l?.launcherFound} class:bad={l && !l.launcherFound}>
         <Icon name={l?.launcherFound ? 'CircleCheck' : 'CircleAlert'} size={20} />
         <div class="status-text">
-          <strong>{l?.launcherFound ? 'Found and ready' : 'Official launcher not found'}</strong>
+          <strong>{l?.launcherFound ? 'Found' : 'Official launcher not found'}</strong>
           {#if l?.launcher}<code class="selectable">{l.launcher.kind === 'store' ? 'Microsoft Store app' : l.launcher.path}</code>{/if}
           {#if l && !l.launcherFound}
-            <p>Here's how to fix it: install the official launcher from minecraft.net, open it once, then click “Detect”. If it lives somewhere unusual, use “Browse…”.</p>
+            <p>Install it from minecraft.net, open it once, then click Detect. If it lives somewhere unusual, use Browse.</p>
           {/if}
           {#if l?.running}<p class="running"><Icon name="Info" size={14} /> The launcher is open right now. Kiln's changes show up the next time it starts.</p>{/if}
         </div>
       </div>
       <div class="buttons">
-        <button class="btn sm" onclick={detect} disabled={detecting}><Icon name="RefreshCw" size={14} class={detecting ? 'spin' : ''} /> Detect</button>
+        <button class="btn sm" onclick={detect} disabled={detecting}>Detect</button>
         <button class="btn sm" onclick={browse}>Browse…</button>
         {#if l && !l.launcherFound}<button class="btn sm primary" onclick={() => api.shell.openExternal('https://www.minecraft.net/download')}><Icon name="ExternalLink" size={14} /> Get the launcher</button>{/if}
       </div>
@@ -106,27 +106,27 @@
           {#if l && !l.minecraftDirFound}<p class="bad-text">This folder doesn't exist yet. Open the official launcher once to create it.</p>{/if}
         </div>
         <div class="buttons">
-          <button class="btn sm" onclick={() => api.shell.openMinecraftDir()}><Icon name="FolderOpen" size={14} /></button>
+          <button class="btn sm" onclick={() => api.shell.openMinecraftDir()}>Open</button>
           <button class="btn sm" onclick={changeGameDir}>Change</button>
         </div>
       </div>
       <div class="path-row">
         <div>
           <strong>Profile backups</strong>
-          <p class="hint">Kiln copies {l?.profilesFile?.split(/[\\/]/).pop() ?? 'launcher_profiles.json'} here before every change (the last 40 are kept).</p>
+          <p class="hint">Kiln copies {l?.profilesFile?.split(/[\\/]/).pop() ?? 'launcher_profiles.json'} here before every change and keeps the last 40.</p>
         </div>
-        <button class="btn sm" onclick={() => api.launcher.openBackups()}><Icon name="FolderOpen" size={14} /> Open</button>
+        <button class="btn sm" onclick={() => api.launcher.openBackups()}>Open</button>
       </div>
     </section>
 
-    <section class="card">
-      <h3><Icon name="Folder" size={18} /> Storage & defaults</h3>
+    <section class="panel">
+      <h3>Storage & defaults</h3>
       <div class="path-row">
         <div>
           <strong>Instances folder</strong>
           <code class="selectable">{app.settings?.dataDir}</code>
         </div>
-        <button class="btn sm" onclick={() => api.shell.openDataDir()}><Icon name="FolderOpen" size={14} /> Open</button>
+        <button class="btn sm" onclick={() => api.shell.openDataDir()}>Open</button>
       </div>
       <div class="mem">
         <div>
@@ -140,22 +140,22 @@
       </div>
     </section>
 
-    <section class="card">
-      <h3><Icon name="Keyboard" size={18} /> Keyboard</h3>
+    <section class="panel">
+      <h3>Keyboard</h3>
       <div class="row-setting">
-        <p class="hint">Kiln has shortcuts for search, new instances, playing and switching tabs.</p>
+        <p class="hint">Most actions have a shortcut.</p>
         <button class="btn sm" onclick={() => openModal({ kind: 'shortcuts' })}>Show shortcuts <span class="kbd">?</span></button>
       </div>
     </section>
 
-    <section class="card about">
+    <section class="panel about">
       <Logo size={56} />
       <div>
         <h3 class="no-icon">Kiln {info?.version ?? ''}</h3>
         <p class="hint">Free and open source under the MIT license.</p>
         <div class="buttons">
           <button class="btn sm" onclick={() => api.shell.openExternal('https://github.com/aubergine-ux/kiln')}><Icon name="ExternalLink" size={14} /> Source code</button>
-          <button class="btn sm" onclick={() => api.shell.openExternal('https://github.com/aubergine-ux/kiln/issues')}><Icon name="Bug" size={14} /> Report a problem</button>
+          <button class="btn sm" onclick={() => api.shell.openExternal('https://github.com/aubergine-ux/kiln/issues')}>Report a problem</button>
         </div>
         <div class="notice"><NotAffiliated /></div>
       </div>
@@ -179,17 +179,14 @@
     gap: 16px;
   }
   section {
-    padding: 22px 24px;
+    padding: 20px 22px;
   }
   h3 {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 17px;
-    margin-bottom: 16px;
-  }
-  h3 :global(.icon) {
-    color: var(--accent-text);
+    font-size: 16px;
+    margin-bottom: 14px;
   }
   .row-setting,
   .path-row,
@@ -216,7 +213,7 @@
     display: block;
     margin-top: 3px;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11.5px;
     color: var(--muted);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -225,16 +222,20 @@
   .status {
     display: flex;
     gap: 12px;
-    padding: 14px;
-    border-radius: 14px;
+    padding: 12px 14px;
+    border-radius: var(--r-2);
     background: var(--surface-2);
     border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+  }
+  .status.ok {
+    border-left-color: var(--ok);
   }
   .status.ok :global(.icon) {
     color: var(--ok);
   }
   .status.bad {
-    border-color: color-mix(in oklab, var(--danger) 35%, var(--border));
+    border-left-color: var(--danger);
   }
   .status.bad > :global(.icon) {
     color: var(--danger);
@@ -281,7 +282,8 @@
     flex-shrink: 0;
   }
   .mem-ctl span {
-    font-weight: 700;
+    font-family: var(--font-mono);
+    font-weight: 600;
     min-width: 56px;
     text-align: right;
   }
@@ -296,10 +298,9 @@
     appearance: none;
     width: 18px;
     height: 18px;
-    border-radius: 50%;
-    background: white;
+    border-radius: var(--r-1);
+    background: var(--surface);
     border: 2px solid var(--accent);
-    box-shadow: var(--shadow-sm);
   }
   .about {
     display: flex;

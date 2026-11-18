@@ -33,7 +33,7 @@
     const b = await attempt(() => api.worlds.backup(inst.id, w.folder), `Couldn't back up ${stripMc(w.name)}`)
     busy = null
     if (b) {
-      toast('ok', `Backed up ${stripMc(w.name)}`, `${bytes(b.size)} saved to Kiln's backups folder.`)
+      toast('ok', `Backed up ${stripMc(w.name)}`, `${bytes(b.size)}, saved in Kiln's backups folder.`)
       await load()
     }
   }
@@ -44,7 +44,7 @@
     if (exists) {
       const c = await confirm({
         title: `Restore "${b.world}"?`,
-        body: `This world already exists. Replace it with the backup from ${dateTime(b.created)} (the current one goes to the trash), or keep both?`,
+        body: `This world is still here. Replace it with the backup from ${dateTime(b.created)}, or keep both? Replacing moves the current world to the trash.`,
         confirm: 'Replace',
         alt: 'Keep both',
         danger: true
@@ -68,7 +68,7 @@
   async function removeWorld(w: World) {
     const c = await confirm({
       title: `Delete "${stripMc(w.name)}"?`,
-      body: 'The world folder goes to the trash. Tip: make a backup first.',
+      body: 'The world folder goes to the trash. You may want a backup first.',
       confirm: 'Delete world',
       alt: 'Back up first',
       danger: true
@@ -118,18 +118,18 @@
 <div class="toolbar">
   <h3>{worlds.length} {worlds.length === 1 ? 'world' : 'worlds'}</h3>
   <div class="spacer"></div>
-  <button class="btn" onclick={() => api.worlds.openBackups(inst.id)}><Icon name="Archive" size={16} /> Backups folder</button>
-  <button class="btn" onclick={() => api.instances.openFolder(inst.id, 'saves')}><Icon name="FolderOpen" size={16} /> Open saves</button>
-  <button class="btn primary" onclick={addWorld}><Icon name="Plus" size={16} stroke={2.4} /> Add world</button>
+  <button class="btn" onclick={() => api.worlds.openBackups(inst.id)}>Backups folder</button>
+  <button class="btn" onclick={() => api.instances.openFolder(inst.id, 'saves')}>Open saves</button>
+  <button class="btn primary" onclick={addWorld}><Icon name="Plus" size={16} /> Add world</button>
 </div>
 
 <div class="scroll">
   {#if !loading && worlds.length === 0}
-    <EmptyState icon="Globe" title="No worlds yet" body="Worlds you create in the game show up here. You can also drag a world folder or .zip into this window." />
+    <EmptyState art="world" title="No worlds yet" body="Worlds you create in the game show up here. You can also drag a world folder or .zip onto this window." />
   {:else}
     <div class="grid">
       {#each worlds as w (w.folder)}
-        <div class="world card" role="group" oncontextmenu={(e) => (e.preventDefault(), worldMenu(e, w))}>
+        <div class="world panel" role="group" oncontextmenu={(e) => (e.preventDefault(), worldMenu(e, w))}>
           <div class="cover">
             {#if w.iconUrl}<img src={w.iconUrl} alt="" draggable="false" />{:else}<div class="ph"><Icon name="Mountain" size={34} stroke={1.6} /></div>{/if}
             {#if w.hardcore}<span class="badge hard"><Icon name="Heart" size={12} /> Hardcore</span>{:else if w.gameMode}<span class="badge">{w.gameMode}</span>{/if}
@@ -138,12 +138,12 @@
             <div class="name"><McText text={w.name} /></div>
             <div class="meta">
               <span>{timeAgo(w.lastPlayed)}</span>
-              {#if w.version}<span>· {w.version}</span>{/if}
+              {#if w.version}<span class="mono">{w.version}</span>{/if}
             </div>
             <div class="folder">{w.folder}</div>
             <div class="actions">
               <button class="btn sm" disabled={busy === w.folder} onclick={() => backup(w)}>
-                {#if busy === w.folder}<Icon name="LoaderCircle" size={15} class="spin" /> Backing up…{:else}<Icon name="Archive" size={15} /> Back up{/if}
+                {#if busy === w.folder}<Icon name="LoaderCircle" size={15} class="spin" /> Backing up…{:else}Back up{/if}
               </button>
               <button class="btn sm ghost icon" aria-label="More" onclick={(e) => worldMenu(e, w)}><Icon name="Ellipsis" size={17} /></button>
             </div>
@@ -155,15 +155,15 @@
 
   {#if backups.length}
     <h4 class="sub">Backups</h4>
-    <ul class="backups">
+    <ul class="backups panel">
       {#each backups as b (b.file)}
         <li>
           <Icon name="Archive" size={18} />
           <div class="b-text">
             <strong>{b.world}</strong>
-            <span>{dateTime(b.created)} · {bytes(b.size)}</span>
+            <span class="mono">{dateTime(b.created)}, {bytes(b.size)}</span>
           </div>
-          <button class="btn sm" onclick={() => restore(b)}><Icon name="RotateCcw" size={15} /> Restore</button>
+          <button class="btn sm" onclick={() => restore(b)}>Restore</button>
           <button class="btn sm ghost icon" aria-label="Show in folder" title="Show in folder" onclick={() => api.shell.showItem(b.path)}><Icon name="FolderOpen" size={16} /></button>
           <button class="btn sm ghost icon danger" aria-label="Delete backup" title="Delete backup" onclick={() => removeBackup(b)}><Icon name="Trash2" size={16} /></button>
         </li>
@@ -176,7 +176,7 @@
   .toolbar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     padding: 16px 28px 12px;
   }
   .toolbar h3 {
@@ -192,22 +192,20 @@
   }
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
   }
   .world {
     overflow: hidden;
-    animation: pop-in 300ms var(--ease) both;
-    transition: transform var(--med) var(--ease), box-shadow var(--med);
+    transition: border-color var(--fast);
   }
   .world:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
+    border-color: var(--border-strong);
   }
   .cover {
     position: relative;
-    aspect-ratio: 16 / 8;
-    background: var(--surface-2);
+    aspect-ratio: 2 / 1;
+    background: var(--surface-3);
     overflow: hidden;
   }
   .cover img {
@@ -221,46 +219,46 @@
     height: 100%;
     display: grid;
     place-items: center;
-    color: color-mix(in oklab, var(--accent) 60%, var(--muted));
-    background:
-      radial-gradient(circle at 30% 20%, var(--accent-soft), transparent 60%),
-      linear-gradient(180deg, var(--surface-2), var(--surface-3));
+    color: var(--muted);
   }
   .badge {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 8px;
+    left: 8px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 9px;
-    border-radius: 99px;
+    padding: 2px 7px;
+    border-radius: var(--r-1);
     font-size: 11.5px;
-    font-weight: 650;
+    font-weight: 600;
     color: white;
-    background: rgb(0 0 0 / 0.5);
-    backdrop-filter: blur(6px);
+    background: rgb(20 16 12 / 0.7);
   }
   .badge.hard {
-    background: color-mix(in oklab, var(--danger) 80%, black);
+    background: var(--danger);
   }
   .body {
-    padding: 12px 14px 14px;
+    padding: 11px 12px 12px;
   }
   .name {
-    font-weight: 650;
+    font-weight: 600;
     font-size: 15px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .meta {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
     font-size: 12.5px;
     color: var(--text-2);
     margin-top: 2px;
   }
   .folder {
-    font-size: 11.5px;
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--muted);
     margin-top: 2px;
     white-space: nowrap;
@@ -270,31 +268,23 @@
   .actions {
     display: flex;
     justify-content: space-between;
-    margin-top: 12px;
+    margin-top: 10px;
   }
   .sub {
-    margin: 30px 0 12px;
-    font-family: var(--font);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--muted);
+    margin: 28px 0 10px;
+    font-size: 15px;
   }
   .backups {
     list-style: none;
     margin: 0;
     padding: 0;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: var(--surface);
     overflow: hidden;
   }
   .backups li {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px 10px 16px;
+    padding: 8px 10px 8px 14px;
     color: var(--muted);
   }
   .backups li + li {
@@ -311,6 +301,6 @@
     font-weight: 600;
   }
   .b-text span {
-    font-size: 12.5px;
+    font-size: 11.5px;
   }
 </style>

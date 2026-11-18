@@ -42,7 +42,7 @@
   {#snippet footer()}
     <button class="btn" onclick={onclose}>Cancel</button>
     <button class="btn primary" disabled={busy} onclick={run}>
-      {#if busy}<Icon name="LoaderCircle" size={16} class="spin" />{:else}<Icon name="Upload" size={16} />{/if} Export…
+      {#if busy}<Icon name="LoaderCircle" size={16} class="spin" />{:else}{/if} Export…
     </button>
   {/snippet}
 </Modal>
@@ -58,7 +58,7 @@
     align-items: flex-start;
     gap: 10px;
     padding: 12px;
-    border-radius: 12px;
+    border-radius: var(--r-2);
     border: 1px solid var(--border);
     cursor: pointer;
   }
