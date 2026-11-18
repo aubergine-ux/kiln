@@ -7,10 +7,8 @@
   import { attempt, confirm, saveSettings } from '@/lib/state.svelte'
   import Icon from './Icon.svelte'
   import Logo from './Logo.svelte'
-  import InstanceIcon from './InstanceIcon.svelte'
 
   const groups = $derived(app.settings?.groups ?? [])
-  const pinned = $derived(app.instances.filter((i) => i.pinned).sort((a, b) => a.name.localeCompare(b.name)))
   let dropTarget = $state<string | null>(null)
 
   const isHome = $derived(app.route.view === 'home')
@@ -57,7 +55,6 @@
     }
   }
 
-  // Reorder folders by dragging them.
   let draggingGroup = $state<string | null>(null)
   async function reorder(target: string) {
     if (!draggingGroup || draggingGroup === target) return
@@ -79,7 +76,7 @@
   <nav class="no-drag">
     <button class="item" class:active={isHome && app.folder === null} onclick={() => showFolder(null)}
       ondragover={(e) => ondragover(e, '__all')} ondragleave={() => (dropTarget = null)} ondrop={(e) => ondrop(e, undefined)} class:target={dropTarget === '__all'}>
-      <Icon name="LayoutGrid" size={18} /> <span>All instances</span>
+      <Icon name="LayoutGrid" size={17} /> <span>All instances</span>
       <span class="count">{app.instances.length}</span>
     </button>
 
@@ -110,29 +107,19 @@
         ondragleave={() => (dropTarget = null)}
         ondrop={(e) => (draggingGroup ? reorder(g) : ondrop(e, g))}
       >
-        <Icon name={app.folder === g && isHome ? 'FolderOpen' : 'Folder'} size={18} />
+        <Icon name={app.folder === g && isHome ? 'FolderOpen' : 'Folder'} size={17} />
         <span>{g}</span>
         <span class="count">{app.instances.filter((i) => i.group === g).length}</span>
         <button class="more btn ghost icon sm" aria-label="Folder options" onclick={(e) => folderMenu(e, g)}><Icon name="Ellipsis" size={16} /></button>
       </div>
     {:else}
-      <p class="empty-hint">Drag instances onto a folder to sort them.</p>
+      <p class="empty-hint">Make a folder, then drag instances onto it.</p>
     {/each}
 
-    {#if pinned.length}
-      <div class="section"><span>Pinned</span></div>
-      {#each pinned as inst (inst.id)}
-        <button class="item pinned" class:active={app.route.view === 'instance' && app.route.id === inst.id} onclick={() => openInstance(inst.id)}>
-          <InstanceIcon icon={inst.icon} url={inst.iconUrl} size={22} />
-          <span>{inst.name}</span>
-        </button>
-      {/each}
-    {/if}
   </nav>
 
   <div class="bottom no-drag">
-    <button class="item" onclick={() => openModal({ kind: 'import' })}><Icon name="FolderInput" size={18} /> <span>Import</span></button>
-    <button class="item" class:active={app.route.view === 'settings'} onclick={() => navigate({ view: 'settings' })}><Icon name="Settings" size={18} /> <span>Settings</span></button>
+    <button class="item" class:active={app.route.view === 'settings'} onclick={() => navigate({ view: 'settings' })}><Icon name="Settings" size={17} /> <span>Settings</span></button>
     <button class="status" onclick={() => navigate({ view: 'settings' })} title={launcherOk ? 'The official launcher was found' : 'Click to fix'}>
       <span class="dot" class:ok={launcherOk}></span>
       {launcherOk ? 'Official launcher ready' : 'Launcher not found'}
@@ -162,9 +149,9 @@
   }
   .name {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 800;
     font-size: 21px;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
   }
   nav {
     flex: 1;
@@ -176,15 +163,16 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    height: 36px;
+    height: 34px;
     padding: 0 10px;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--r-2);
     background: transparent;
     color: var(--text-2);
-    font-weight: 550;
+    font-weight: 500;
     text-align: left;
-    transition: background var(--fast), color var(--fast), transform var(--fast);
+    position: relative;
+    transition: background var(--fast), color var(--fast);
     cursor: pointer;
     outline: none;
   }
@@ -201,7 +189,17 @@
   .item.active {
     background: var(--surface);
     color: var(--text);
-    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+  }
+  .item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+    background: var(--accent);
   }
   .item.active :global(.icon) {
     color: var(--accent-text);
@@ -209,13 +207,12 @@
   .item.target {
     background: var(--accent-soft);
     color: var(--accent-text);
-    transform: scale(1.02);
-    box-shadow: inset 0 0 0 1.5px var(--accent);
+    box-shadow: inset 0 0 0 2px var(--accent);
   }
   .count {
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
     color: var(--muted);
-    font-variant-numeric: tabular-nums;
   }
   .folder .more {
     display: none;
@@ -231,20 +228,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 6px 6px 10px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
+    padding: 18px 4px 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--muted);
   }
   .empty-hint {
     font-size: 12.5px;
     color: var(--muted);
     padding: 4px 10px;
-  }
-  .pinned {
-    height: 34px;
   }
   .bottom {
     padding: 10px;
@@ -258,7 +250,7 @@
     margin-top: 6px;
     padding: 8px 10px;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--r-2);
     background: none;
     font-size: 12px;
     color: var(--muted);
@@ -268,14 +260,12 @@
     background: color-mix(in oklab, var(--text) 5%, transparent);
   }
   .dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--danger);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--danger) 20%, transparent);
   }
   .dot.ok {
     background: var(--ok);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 20%, transparent);
   }
 </style>

@@ -10,6 +10,7 @@
   import InstanceIcon from '@/components/InstanceIcon.svelte'
   import TopBar from '@/components/TopBar.svelte'
   import LoaderGuide from '@/components/LoaderGuide.svelte'
+  import KilnBand from '@/components/KilnBand.svelte'
   import ContentTab from './instance/ContentTab.svelte'
   import WorldsTab from './instance/WorldsTab.svelte'
   import ScreenshotsTab from './instance/ScreenshotsTab.svelte'
@@ -22,7 +23,7 @@
   const TABS: { id: Tab; label: string; icon: string }[] = [
     { id: 'mods', label: 'Mods', icon: 'Puzzle' },
     { id: 'resourcepacks', label: 'Resource packs', icon: 'Palette' },
-    { id: 'shaderpacks', label: 'Shaders', icon: 'Sparkles' },
+    { id: 'shaderpacks', label: 'Shaders', icon: 'Aperture' },
     { id: 'datapacks', label: 'Data packs', icon: 'Package' },
     { id: 'worlds', label: 'Worlds', icon: 'Globe' },
     { id: 'screenshots', label: 'Screenshots', icon: 'Camera' },
@@ -56,26 +57,26 @@
   </TopBar>
 
   <div class="head">
-    <button class="icon-btn" onclick={() => openModal({ kind: 'icon', instance: inst })} title="Change icon">
-      <InstanceIcon icon={inst.icon} url={inst.iconUrl} size={84} />
-      <span class="edit"><Icon name="Pencil" size={14} /></span>
-    </button>
-    <div class="info">
-      <h1 title={inst.name}>{inst.name}</h1>
-      <div class="meta">
-        <span class="chip">{inst.mcVersion}</span>
-        {#if inst.loader !== 'vanilla'}<span class="chip accent">{loaderLabel(inst)}{inst.loaderVersion ? ` ${inst.loaderVersion}` : ''}</span>{/if}
-        {#if inst.group}<span class="chip"><Icon name="Folder" size={12} /> {inst.group}</span>{/if}
-        <span class="sub">{plural(inst.modCount, 'mod')} · {memory(inst.memoryMb)} memory · {inst.lastPlayed ? `Played ${timeAgo(inst.lastPlayed).toLowerCase()}` : 'Never played'}</span>
-      </div>
-    </div>
-    <div class="head-actions">
-      <button class="btn icon" title="Open folder" aria-label="Open folder" onclick={() => api.instances.openFolder(inst.id)}><Icon name="FolderOpen" /></button>
-      <button class="btn icon" title="More" aria-label="More options" onclick={(e) => openMenuAt(e, instanceMenu(inst))}><Icon name="Ellipsis" /></button>
-      <button class="play" onclick={() => play(inst)}>
-        <Icon name="Play" size={22} stroke={2.4} /> Play
+    <KilnBand>
+      <button class="icon-btn" onclick={() => openModal({ kind: 'icon', instance: inst })} title="Change icon">
+        <InstanceIcon icon={inst.icon} url={inst.iconUrl} size={72} />
       </button>
-    </div>
+      <div class="info">
+        <h1 title={inst.name}>{inst.name}</h1>
+        <div class="meta">
+          <span class="chip">{inst.mcVersion}</span>
+          {#if inst.loader !== 'vanilla'}<span class="chip accent">{loaderLabel(inst).toLowerCase()} {inst.loaderVersion ?? ''}</span>{/if}
+          <span class="chip">{plural(inst.modCount, 'mod')}</span>
+          <span class="chip">{memory(inst.memoryMb)}</span>
+          <span class="chip">{inst.lastPlayed ? `played ${timeAgo(inst.lastPlayed).toLowerCase()}` : 'never played'}</span>
+        </div>
+      </div>
+      <div class="head-actions">
+        <button class="band-btn" title="Open folder" aria-label="Open folder" onclick={() => api.instances.openFolder(inst.id)}><Icon name="FolderOpen" size={18} /></button>
+        <button class="band-btn" title="More" aria-label="More options" onclick={(e) => openMenuAt(e, instanceMenu(inst))}><Icon name="Ellipsis" size={18} /></button>
+        <button class="btn primary lg play" onclick={() => play(inst)}><Icon name="Play" size={17} /> Play</button>
+      </div>
+    </KilnBand>
   </div>
 
   {#if inst.warning}
@@ -89,7 +90,6 @@
   <div class="tabs" role="tablist">
     {#each TABS as t, i (t.id)}
       <button role="tab" aria-selected={tab === t.id} class:active={tab === t.id} onclick={() => setTab(t.id)} title="{t.label} ({i + 1})">
-        <Icon name={t.icon} size={16} />
         {t.label}
         {#if t.id === 'mods' && inst.modCount}<span class="count">{inst.modCount}</span>{/if}
       </button>
@@ -115,44 +115,17 @@
 
 <style>
   .back {
-    margin-left: -10px;
+    margin-left: -8px;
     color: var(--text-2);
   }
   .head {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    padding: 4px 28px 18px;
+    padding: 0 28px 16px;
   }
   .icon-btn {
-    position: relative;
     border: none;
     background: none;
     padding: 0;
-    border-radius: 22px;
-    transition: transform var(--med) var(--ease-spring);
-  }
-  .icon-btn:hover {
-    transform: rotate(-3deg) scale(1.04);
-  }
-  .edit {
-    position: absolute;
-    right: -6px;
-    bottom: -6px;
-    width: 28px;
-    height: 28px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    color: var(--text-2);
-    opacity: 0;
-    transition: opacity var(--fast);
-  }
-  .icon-btn:hover .edit {
-    opacity: 1;
+    border-radius: var(--r-2);
   }
   .info {
     flex: 1;
@@ -167,42 +140,33 @@
   .meta {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
+    gap: 4px 14px;
     margin-top: 8px;
-  }
-  .sub {
-    color: var(--muted);
-    font-size: 13px;
-    margin-left: 4px;
   }
   .head-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
+  }
+  .band-btn {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: none;
+    border-radius: var(--r-2);
+    background: none;
+    color: var(--band-muted);
+  }
+  .band-btn:hover {
+    color: var(--band-text);
+    background: rgb(255 255 255 / 0.08);
   }
   .play {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    height: 52px;
-    padding: 0 28px 0 22px;
-    margin-left: 6px;
-    border: none;
-    border-radius: 16px;
-    color: white;
-    font-family: var(--font-display);
-    font-size: 19px;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 55%, var(--accent-2)));
-    box-shadow: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 8px 24px color-mix(in oklab, var(--accent) 40%, transparent);
-    transition: transform var(--fast) var(--ease-spring), box-shadow var(--med);
-  }
-  .play:hover {
-    transform: scale(1.05);
-  }
-  .play:active {
-    transform: scale(0.97);
+    height: 46px;
+    padding: 0 24px 0 18px;
+    margin-left: 8px;
+    font-size: 16px;
   }
   .guide-wrap {
     padding: 0 28px 14px;
@@ -211,15 +175,15 @@
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    padding: 14px 16px;
-    border-radius: var(--radius-lg);
-    background: color-mix(in oklab, var(--warn) 9%, var(--surface));
+    padding: 12px 14px;
+    border-radius: var(--r-3);
+    background: color-mix(in oklab, var(--warn) 8%, var(--surface));
     border: 1px solid color-mix(in oklab, var(--warn) 30%, var(--border));
     color: var(--text-2);
     line-height: 1.5;
   }
   .warning :global(.icon) {
-    color: color-mix(in oklab, var(--warn) 85%, var(--text));
+    color: var(--warn);
     margin-top: 1px;
   }
   .tabs {
@@ -237,33 +201,26 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    height: 42px;
-    padding: 0 12px;
+    height: 40px;
+    padding: 0 11px;
     border: none;
     background: none;
     color: var(--muted);
     font-weight: 600;
     white-space: nowrap;
-    border-radius: 10px 10px 0 0;
-    transition: color var(--fast);
   }
-  .tabs button:hover {
-    color: var(--text);
-  }
+  .tabs button:hover,
   .tabs button.active {
     color: var(--text);
   }
-  .tabs button.active :global(.icon) {
-    color: var(--accent-text);
-  }
+  /* The underline slides in so you can see which tab you moved to. */
   .tabs button::after {
     content: '';
     position: absolute;
-    left: 10px;
-    right: 10px;
+    left: 9px;
+    right: 9px;
     bottom: -1px;
-    height: 2.5px;
-    border-radius: 3px 3px 0 0;
+    height: 2px;
     background: var(--accent);
     transform: scaleX(0);
     transition: transform var(--med) var(--ease);
@@ -272,9 +229,10 @@
     transform: scaleX(1);
   }
   .count {
+    font-family: var(--font-mono);
     font-size: 11px;
-    padding: 1px 6px;
-    border-radius: 99px;
+    padding: 0 5px;
+    border-radius: var(--r-1);
     background: var(--surface-3);
     color: var(--text-2);
   }
