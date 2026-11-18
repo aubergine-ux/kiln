@@ -6,9 +6,20 @@ import yazl from 'yazl'
 import { safeJoin } from './fs'
 
 function open(file: string): Promise<yauzl.ZipFile> {
+  // Names are decoded by hand (see walkZip) so one odd entry doesn't make the whole zip unreadable.
   return new Promise((resolve, reject) =>
-    yauzl.open(file, { lazyEntries: true, autoClose: false }, (err, zip) => (err ? reject(err) : resolve(zip)))
+    yauzl.open(file, { lazyEntries: true, autoClose: false, decodeStrings: false }, (err, zip) => (err ? reject(err) : resolve(zip)))
   )
+}
+
+/**
+ * Decode an entry name. Entries with unsafe names (such as "/" or "../x", which some
+ * hand-made packs contain) return null and are skipped.
+ */
+function entryName(entry: yauzl.Entry): string | null {
+  const raw = entry.fileName as unknown as Buffer
+  const name = yauzl.getFileNameLowLevel(entry.generalPurposeBitFlag, raw, entry.extraFields, false)
+  return yauzl.validateFileName(name) === null ? name : null
 }
 
 function readStream(zip: yauzl.ZipFile, entry: yauzl.Entry): Promise<NodeJS.ReadableStream> {
@@ -32,6 +43,9 @@ export async function walkZip(
   try {
     await new Promise<void>((resolve, reject) => {
       zip.on('entry', async (entry: yauzl.Entry) => {
+        const name = entryName(entry)
+        if (name === null) return zip.readEntry()
+        entry.fileName = name
         try {
           const keepGoing = await onEntry(
             entry,

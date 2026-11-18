@@ -71,3 +71,28 @@ describe('classifyPath', () => {
     expect(await classifyPath(await makeZip(path.join(dir, 'random.zip'), { 'readme.txt': 'x' }))).toBe('unknown')
   })
 })
+
+describe('classifyPath with unusual packs', () => {
+  it('recognises a resource pack zipped inside an extra folder', async () => {
+    expect(await classifyPath(await makeZip(path.join(dir, 'wrapped.zip'), { 'My Pack/pack.mcmeta': '{}', 'My Pack/assets/minecraft/x.png': 'x' }))).toBe('resourcepacks')
+    expect(await classifyPath(await makeZip(path.join(dir, 'nomcmeta.zip'), { 'Edit/assets/minecraft/shaders/post/a.json': '{}' }))).toBe('resourcepacks')
+  })
+})
+
+describe('damaged zips', () => {
+  it('skips entries with unsafe names instead of failing', async () => {
+    const file = await resourcePack(dir, 'Odd', 'Still works')
+    // Patch a harmless entry name into "/" in both the local and central headers.
+    const { readFile, writeFile: write } = await import('node:fs/promises')
+    const buf = await readFile(file)
+    const target = Buffer.from('assets/minecraft/textures/block/stone.png')
+    let i = buf.indexOf(target)
+    while (i >= 0) {
+      buf.write('/'.padEnd(target.length, '\0'), i, 'latin1')
+      i = buf.indexOf(target, i + 1)
+    }
+    await write(file, buf)
+    expect((await readPackMeta(file)).description).toBe('Still works')
+    expect(await classifyPath(file)).toBe('resourcepacks')
+  })
+})

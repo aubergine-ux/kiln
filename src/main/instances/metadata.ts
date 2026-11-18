@@ -176,17 +176,20 @@ export async function classifyPath(target: string): Promise<DropKind> {
 
   const entries: string[] = []
   await walkZip(target, async (e) => {
-    entries.push(e.fileName)
-    return entries.length < 4000
+    entries.push(e.fileName.replace(/\\/g, '/'))
+    return entries.length < 50000
   }).catch(() => {})
   const set = new Set(entries)
   if (set.has('modrinth.index.json') || set.has('manifest.json')) return 'modpack'
   if (entries.some((n) => /^([^/]+\/)?level\.dat$/.test(n))) return 'world'
   if (entries.some((n) => n.startsWith('shaders/'))) return 'shaderpacks'
-  if (set.has('pack.mcmeta')) {
-    const hasData = entries.some((n) => n.startsWith('data/'))
-    const hasAssets = entries.some((n) => n.startsWith('assets/'))
+  // Some packs are zipped with an extra folder around them; look one level down too.
+  const top = set.has('pack.mcmeta') ? '' : entries.find((n) => /^[^/]+\/pack\.mcmeta$/.test(n))?.replace('pack.mcmeta', '')
+  if (top !== undefined) {
+    const hasData = entries.some((n) => n.startsWith(`${top}data/`))
+    const hasAssets = entries.some((n) => n.startsWith(`${top}assets/`))
     return hasData && !hasAssets ? 'datapacks' : 'resourcepacks'
   }
+  if (entries.some((n) => /^([^/]+\/)?assets\/minecraft\//.test(n))) return 'resourcepacks'
   return 'unknown'
 }
