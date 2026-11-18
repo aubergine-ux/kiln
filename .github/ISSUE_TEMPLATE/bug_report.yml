@@ -1,0 +1,37 @@
+name: Bug report
+description: Something in Kiln doesn't work the way it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Kiln version
+      description: Shown at the bottom of Settings.
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows, macOS, Linux]
+    validations:
+      required: true
+  - type: input
+    id: launcher
+    attributes:
+      label: How the official launcher is installed
+      placeholder: e.g. Microsoft Store, .exe installer, Flatpak, AUR package
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Anything that helps, such as the instance's latest.log or a crash report.
+      render: text
