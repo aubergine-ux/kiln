@@ -124,6 +124,16 @@ export async function inspectModpack(file: string): Promise<ModpackSummary> {
 export async function importModpack(file: string, name?: string): Promise<ModpackResult> {
   const pack = await parse(file)
   const s = pack.summary
+  // Check every listed path before creating anything.
+  if (pack.format === 'mrpack') {
+    for (const f of pack.index.files ?? []) {
+      try {
+        safeJoin('/instance', f.path)
+      } catch {
+        throw new KilnError('This modpack tries to put files outside its instance folder, so Kiln stopped.', `Unsafe path: ${f.path}`)
+      }
+    }
+  }
   const id = await createInstanceFolder({
     name: name?.trim() || s.name,
     versionId: s.versionId,
