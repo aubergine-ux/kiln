@@ -225,7 +225,7 @@ test('capture README screenshots', async () => {
   }
   const open = async (name: string, tab: string) => {
     await win.getByRole('button', { name: /All instances/ }).click()
-    await win.locator('.row', { hasText: name }).first().click()
+    await win.locator('.table .row', { hasText: name }).first().click()
     await win.getByRole('tab', { name: tab }).click()
   }
 

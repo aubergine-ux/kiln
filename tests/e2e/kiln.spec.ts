@@ -209,7 +209,7 @@ test.describe.serial('Kiln', () => {
 
     await win.locator('.item.folder', { hasText: 'Modded' }).click()
     await expect(win.getByRole('heading', { name: 'Modded' })).toBeVisible()
-    await expect(win.locator('.row', { hasText: 'Fabric Fun' })).toBeVisible()
+    await expect(win.locator('.table .row', { hasText: 'Fabric Fun' })).toBeVisible()
   })
 
   test('search filters instances', async () => {
@@ -294,7 +294,7 @@ test.describe.serial('Kiln', () => {
 
   test('shows install steps for a loader that is not installed', async () => {
     await win.getByRole('button', { name: /All instances/ }).click()
-    await win.locator('.row', { hasText: 'Old Times' }).click()
+    await win.locator('.table .row', { hasText: 'Old Times' }).click()
     await expect(win.getByText('Install Fabric 0.15.11 for 1.20.1 to play this instance')).toBeVisible()
   })
 
@@ -314,7 +314,7 @@ test.describe.serial('Kiln', () => {
   test('explains a missing launcher', async () => {
     await invoke('settings.update', { launcher: { kind: 'command', path: path.join(root, 'nope'), label: 'Gone' } })
     await win.getByRole('button', { name: /All instances/ }).click()
-    await win.locator('.row', { hasText: 'Second Run' }).getByRole('button', { name: /^Play/ }).click()
+    await win.locator('.table .row', { hasText: 'Second Run' }).getByRole('button', { name: /^Play/ }).click()
     await expect(win.getByText("Couldn't open the official launcher")).toBeVisible()
     await expect(win.getByText(/Official launcher not found/).first()).toBeVisible()
   })
