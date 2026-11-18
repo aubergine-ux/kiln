@@ -76,7 +76,7 @@ test.afterAll(async () => {
 
 test.describe.serial('Kiln', () => {
   test('shows a friendly empty home screen', async () => {
-    await expect(win.getByText('Fire up your first instance')).toBeVisible()
+    await expect(win.getByText('No instances yet')).toBeVisible()
     await expect(win.getByText('Official launcher ready')).toBeVisible()
   })
 
@@ -189,7 +189,7 @@ test.describe.serial('Kiln', () => {
     await expect(win.locator('.mcount')).toHaveText('1 / 2')
     await expect(win.locator('mark')).toHaveCount(2)
     await win.getByRole('button', { name: /crash-2026/ }).click()
-    await expect(win.getByText('Rendering overlay — java.lang.NullPointerException: oops')).toBeVisible()
+    await expect(win.getByText('Rendering overlay: java.lang.NullPointerException: oops')).toBeVisible()
   })
 
   test('folders, pinning, duplicating and renaming', async () => {
@@ -209,7 +209,7 @@ test.describe.serial('Kiln', () => {
 
     await win.locator('.item.folder', { hasText: 'Modded' }).click()
     await expect(win.getByRole('heading', { name: 'Modded' })).toBeVisible()
-    await expect(win.locator('.card h3', { hasText: 'Fabric Fun' })).toBeVisible()
+    await expect(win.locator('.row', { hasText: 'Fabric Fun' })).toBeVisible()
   })
 
   test('search filters instances', async () => {
@@ -217,7 +217,7 @@ test.describe.serial('Kiln', () => {
     await win.keyboard.press('Control+k')
     await expect(win.locator('#search')).toBeFocused()
     await win.keyboard.type('second')
-    await expect(win.locator('.grid .card')).toHaveCount(1)
+    await expect(win.locator('.table .row')).toHaveCount(1)
     await win.keyboard.press('Escape')
   })
 
@@ -294,7 +294,7 @@ test.describe.serial('Kiln', () => {
 
   test('shows install steps for a loader that is not installed', async () => {
     await win.getByRole('button', { name: /All instances/ }).click()
-    await win.locator('.card', { hasText: 'Old Times' }).click()
+    await win.locator('.row', { hasText: 'Old Times' }).click()
     await expect(win.getByText('Install Fabric 0.15.11 for 1.20.1 to play this instance')).toBeVisible()
   })
 
@@ -314,7 +314,7 @@ test.describe.serial('Kiln', () => {
   test('explains a missing launcher', async () => {
     await invoke('settings.update', { launcher: { kind: 'command', path: path.join(root, 'nope'), label: 'Gone' } })
     await win.getByRole('button', { name: /All instances/ }).click()
-    await win.locator('.card', { hasText: 'Second Run' }).getByRole('button', { name: /^Play/ }).click()
+    await win.locator('.row', { hasText: 'Second Run' }).getByRole('button', { name: /^Play/ }).click()
     await expect(win.getByText("Couldn't open the official launcher")).toBeVisible()
     await expect(win.getByText(/Official launcher not found/).first()).toBeVisible()
   })
