@@ -20,7 +20,6 @@ function registerIpc(): void {
     try {
       return { ok: true, value: await fn(...args) }
     } catch (err) {
-      if (!app.isPackaged) console.error(`[${channel}]`, err)
       return { ok: false, error: toErrorInfo(err) }
     }
   })

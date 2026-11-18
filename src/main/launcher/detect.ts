@@ -9,7 +9,7 @@ import { defaultDataDir, defaultMinecraftDirs } from '../paths'
 const run = promisify(execFile)
 
 /** Microsoft Store / Xbox app package of the official launcher. */
-export const STORE_APP_ID = 'Microsoft.4297127D64EC6_8wekyb3d8bbwe!Minecraft'
+const STORE_APP_ID = 'Microsoft.4297127D64EC6_8wekyb3d8bbwe!Minecraft'
 const FLATPAK_ID = 'com.mojang.Minecraft'
 
 async function onPath(command: string): Promise<string | null> {
@@ -71,7 +71,7 @@ async function findLinux(): Promise<LauncherCandidate[]> {
   return found
 }
 
-export async function findLaunchers(): Promise<LauncherCandidate[]> {
+async function findLaunchers(): Promise<LauncherCandidate[]> {
   if (process.platform === 'win32') return findWindows()
   if (process.platform === 'darwin') return findMac()
   return findLinux()
@@ -89,7 +89,6 @@ export async function detectSetup(): Promise<SetupDetection> {
   }
 }
 
-/** Check that a saved launcher still exists. */
 export async function launcherExists(c: LauncherCandidate | null): Promise<boolean> {
   if (!c) return false
   if (c.kind === 'store' || c.kind === 'flatpak') return (await findLaunchers()).some((l) => l.kind === c.kind)

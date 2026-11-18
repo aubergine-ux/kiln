@@ -197,7 +197,7 @@ export const api = {
     },
     openPath: async (p: string) => {
       const err = await shell.openPath(p)
-      if (err) throw new KilnError('That could not be opened.', err)
+      if (err) throw new KilnError('Kiln could not open that.', err)
     },
     showItem: async (p: string) => shell.showItemInFolder(p),
     openDataDir: async () => openDir((await getSettings()).dataDir),

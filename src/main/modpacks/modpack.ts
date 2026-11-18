@@ -148,7 +148,6 @@ export async function importModpack(file: string, name?: string): Promise<Modpac
   let downloaded = 0
 
   try {
-    // 1. Download the listed files.
     const jobs: (DownloadJob & { label: string })[] = []
     if (pack.format === 'mrpack') {
       for (const f of pack.index.files ?? []) {
@@ -190,7 +189,7 @@ export async function importModpack(file: string, name?: string): Promise<Modpac
       })
     }
 
-    // 2. Copy overrides (configs, resource packs, ...) on top.
+    // Overrides (configs, resource packs) go on top of the downloaded files.
     progress.setLabel(`Copying files for ${s.name}`)
     for (const prefix of overridesPrefix) await extractZip(file, game, prefix, () => progress.tick())
 

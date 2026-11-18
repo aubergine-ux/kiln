@@ -24,12 +24,12 @@ import { openLauncher } from '../launcher/launch'
 
 const CONFIG = 'instance.json'
 const ICON = 'icon.png'
-export const GAME_FOLDERS = ['mods', 'resourcepacks', 'shaderpacks', 'saves', 'screenshots', 'config']
+const GAME_FOLDERS = ['mods', 'resourcepacks', 'shaderpacks', 'saves', 'screenshots', 'config']
 
-const GLYPHS = ['pickaxe', 'sword', 'tree', 'gem', 'flame', 'castle', 'mountain', 'compass']
+const GLYPHS = ['pickaxe', 'sword', 'axe', 'tree', 'gem', 'flame', 'castle', 'mountain', 'potion', 'crown']
 const COLORS = ['ember', 'moss', 'sky', 'violet', 'rose', 'sand', 'slate', 'teal']
 
-export function randomIcon(): InstanceIcon {
+function randomIcon(): InstanceIcon {
   const pick = <T>(a: T[]) => a[Math.floor(Math.random() * a.length)]
   return { kind: 'glyph', glyph: pick(GLYPHS), color: pick(COLORS) }
 }
@@ -230,7 +230,7 @@ export async function deleteInstance(id: string): Promise<void> {
   await trash(instanceDir(s, id))
 }
 
-export interface PlayResult {
+interface PlayResult {
   launcherWasRunning: boolean
   versionMissing: boolean
 }

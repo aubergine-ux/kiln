@@ -12,7 +12,7 @@ import { layout } from '../paths'
  * and we always copy it to Kiln's backup folder before writing.
  */
 
-export interface LauncherProfile {
+interface LauncherProfile {
   name: string
   type: string
   created?: string
@@ -60,7 +60,7 @@ async function readProfiles(file: string): Promise<ProfilesFile> {
   } catch {
     throw new KilnError(
       `The launcher's profiles file could not be read (${path.basename(file)}).`,
-      'It looks damaged. Open the official launcher once so it can repair it, or restore a copy from Kiln\'s backup folder (Settings → Open backups).'
+      'It looks damaged. Open the official launcher once so it can repair it, or restore a copy from Settings, Profile backups.'
     )
   }
 }
@@ -108,7 +108,7 @@ async function editNow(
   }
 }
 
-export interface ProfileInput {
+interface ProfileInput {
   id: string
   name: string
   versionId: string

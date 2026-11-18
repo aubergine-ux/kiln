@@ -70,7 +70,7 @@ export async function uniquePath(dir: string, name: string): Promise<string> {
 }
 
 /** True if `child` is inside `parent` (or equal to it). */
-export function isInside(parent: string, child: string): boolean {
+function isInside(parent: string, child: string): boolean {
   const rel = path.relative(path.resolve(parent), path.resolve(child))
   return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel))
 }
@@ -82,17 +82,6 @@ export function safeJoin(root: string, relative: string): string {
   const full = path.resolve(root, cleaned)
   if (!isInside(root, full) || full === path.resolve(root)) throw new Error(`Unsafe path: ${relative}`)
   return full
-}
-
-export async function dirSize(p: string): Promise<number> {
-  let total = 0
-  const entries = await fs.readdir(p, { withFileTypes: true }).catch(() => [])
-  for (const e of entries) {
-    const full = path.join(p, e.name)
-    if (e.isDirectory()) total += await dirSize(full)
-    else total += (await statOrNull(full))?.size ?? 0
-  }
-  return total
 }
 
 export function nowIso(): string {

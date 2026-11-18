@@ -1,6 +1,6 @@
 import type { Loader } from './types'
 
-/** Display names, colours and where to get each loader's official installer. */
+/** Display names, and where to get each loader's official installer. */
 export const LOADERS: Record<Loader, { label: string; installer?: (mc: string) => string; steps?: string }> = {
   vanilla: { label: 'Vanilla' },
   fabric: {

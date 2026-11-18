@@ -35,6 +35,5 @@ export const layout = {
   instance: (dataDir: string, id: string) => path.join(dataDir, 'instances', id),
   gameDir: (dataDir: string, id: string) => path.join(dataDir, 'instances', id, 'minecraft'),
   profileBackups: (dataDir: string) => path.join(dataDir, 'backups', 'launcher-profiles'),
-  worldBackups: (dataDir: string, id: string) => path.join(dataDir, 'backups', 'worlds', id),
-  exports: (dataDir: string) => path.join(dataDir, 'exports')
+  worldBackups: (dataDir: string, id: string) => path.join(dataDir, 'backups', 'worlds', id)
 }

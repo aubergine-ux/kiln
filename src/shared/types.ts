@@ -20,7 +20,6 @@ export interface Settings {
   groups: string[]
   collapsedGroups: string[]
   defaultMemoryMb: number
-  /** Turn off non-essential animations. */
   reduceMotion: boolean
 }
 

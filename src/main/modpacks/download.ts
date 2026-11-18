@@ -16,7 +16,7 @@ export interface DownloadJob {
 const userAgent = () => `Kiln/${app.getVersion()} (desktop instance manager)`
 
 /** Download one file to a temp name, check its hashes, then move it into place. */
-export async function downloadFile(job: DownloadJob): Promise<void> {
+async function downloadFile(job: DownloadJob): Promise<void> {
   let lastError: unknown
   for (const url of job.urls) {
     if (!/^https:\/\//i.test(url)) {
