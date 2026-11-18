@@ -70,7 +70,9 @@ test.beforeAll(async () => {
 })
 
 test.afterAll(async () => {
-  await app?.close()
+  // Under xvfb on CI, Electron sometimes never finishes closing; don't let that fail the run.
+  await Promise.race([app?.close(), new Promise((r) => setTimeout(r, 10_000))])
+  app?.process().kill('SIGKILL')
   await fs.rm(root, { recursive: true, force: true }).catch(() => {})
 })
 
