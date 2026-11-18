@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+dist/
+release/
+*.tsbuildinfo
+coverage/
+test-results/
+playwright-report/
+
+# Logs and env
+*.log
+npm-debug.log*
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# AI tool files and personal notes
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+AGENTS.md
+.cursor/
+.aider*
+notes/
+NOTES.md
+*.notes.md
