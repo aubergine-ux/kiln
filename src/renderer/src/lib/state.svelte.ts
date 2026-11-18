@@ -106,7 +106,26 @@ export function confirm(opts: Omit<ConfirmRequest, 'resolve'>): Promise<'confirm
 
 // ---------- Loading data ----------
 
-export async function refreshInstances(): Promise<void> {
+let refreshing: Promise<void> | null = null
+let again = false
+
+/** Reload the instance list. Calls that arrive while a reload is running are merged into one more. */
+export function refreshInstances(): Promise<void> {
+  if (refreshing) {
+    again = true
+    return refreshing
+  }
+  refreshing = loadInstances().finally(() => {
+    refreshing = null
+    if (again) {
+      again = false
+      refreshInstances()
+    }
+  })
+  return refreshing
+}
+
+async function loadInstances(): Promise<void> {
   app.instances = await api.instances.list()
   // Instances made by an import have no icon picture yet; draw one so the launcher shows it too.
   for (const inst of app.instances) {

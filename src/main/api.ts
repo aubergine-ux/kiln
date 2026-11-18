@@ -31,6 +31,13 @@ export function startVersionWatcher(minecraftDir: string): void {
   watchVersions(minecraftDir, () => notify('versions-changed'))
 }
 
+/** Let every window know the instance list changed, then pass the result through. */
+async function changed<T>(work: Promise<T>): Promise<T> {
+  const result = await work
+  notify('instances-changed')
+  return result
+}
+
 async function openDir(dir: string): Promise<void> {
   await fs.mkdir(dir, { recursive: true })
   const err = await shell.openPath(dir)
@@ -83,11 +90,11 @@ export const api = {
   instances: {
     list: store.listInstances,
     get: store.getInstance,
-    create: (input: NewInstance) => store.createInstance(input),
-    update: (id: string, patch: store.InstancePatch) => store.updateInstance(id, patch),
+    create: (input: NewInstance) => changed(store.createInstance(input)),
+    update: (id: string, patch: store.InstancePatch) => changed(store.updateInstance(id, patch)),
     setIcon: (id: string, icon: InstanceIcon, png: string) => store.setIcon(id, icon, png),
-    duplicate: (id: string) => store.duplicateInstance(id),
-    remove: (id: string) => store.deleteInstance(id),
+    duplicate: (id: string) => changed(store.duplicateInstance(id)),
+    remove: (id: string) => changed(store.deleteInstance(id)),
     play: (id: string) => store.playInstance(id),
     openFolder: async (id: string, sub = '') => openDir(sub ? safeJoin(store.gameDir(await getSettings(), id), sub) : store.gameDir(await getSettings(), id)),
     setGroups: (groups: string[]) => store.setGroups(groups),
