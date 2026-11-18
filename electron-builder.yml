@@ -1,0 +1,42 @@
+appId: io.github.aubergineux.kiln
+productName: Kiln
+copyright: Copyright © 2026 Aubergine-UX
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**
+  - resources/icon.png
+  - package.json
+asarUnpack:
+  - resources/**
+publish: null
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  artifactName: Kiln-Windows-Setup.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: Kiln
+
+mac:
+  target:
+    - target: dmg
+      arch: [universal]
+  category: public.app-category.utilities
+  artifactName: Kiln-macOS.${ext}
+
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+  category: Utility
+  syncDesktopName: true
+  synopsis: Instance and mod manager that plays through the official launcher
+  maintainer: Aubergine-UX <Aubergine-UX@users.noreply.github.com>
+  artifactName: Kiln-Linux.${ext}

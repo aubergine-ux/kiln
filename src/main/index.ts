@@ -41,7 +41,7 @@ async function createWindow(): Promise<void> {
     show: false,
     title: 'Kiln',
     backgroundColor: dark ? '#17130f' : '#faf7f2',
-    icon: path.join(__dirname, '../../resources/icon.png'),
+    icon: path.join(app.getAppPath(), 'resources/icon.png'),
     titleBarStyle: 'hidden',
     ...(process.platform === 'darwin'
       ? { trafficLightPosition: { x: 18, y: 15 } }
