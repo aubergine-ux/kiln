@@ -74,7 +74,16 @@ test.afterAll(async () => {
   const proc = app?.process()
   const exited = new Promise<boolean>((r) => (proc ? proc.once('exit', () => r(true)) : r(true)))
   await app?.evaluate(({ app }) => app.exit(0)).catch(() => {})
-  if (!(await Promise.race([exited, new Promise<boolean>((r) => setTimeout(() => r(false), 10_000))]))) proc?.kill('SIGKILL')
+  await Promise.race([exited, new Promise((r) => setTimeout(r, 10_000))])
+  // Electron's helper processes can outlive it on CI and keep the test worker waiting.
+  // Playwright starts Electron in its own process group, so end the whole group.
+  if (proc?.pid && process.platform !== 'win32') {
+    try {
+      process.kill(-proc.pid, 'SIGKILL')
+    } catch {
+      // Already gone.
+    }
+  }
   await fs.rm(root, { recursive: true, force: true }).catch(() => {})
 })
 
