@@ -211,7 +211,7 @@
           </div>
           <div class="text">
             <div class="line1">
-              <span class="name">{kind === 'mods' ? item.name : stripMc(item.name)}</span>
+              <span class="name" title={stripMc(item.name)}>{#if kind === 'mods'}{item.name}{:else}<McText text={item.name} />{/if}</span>
               {#if item.version}<span class="ver">{item.version}</span>{/if}
               {#if wrongLoader(item)}<span class="chip warn" title="This mod is made for a different loader">{LOADERS[item.loader!].label} mod</span>{/if}
             </div>

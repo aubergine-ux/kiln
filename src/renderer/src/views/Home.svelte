@@ -151,6 +151,7 @@
   .title {
     font-size: 24px;
     margin-right: auto;
+    flex-shrink: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -161,6 +162,8 @@
     gap: 8px;
     height: 38px;
     width: 280px;
+    min-width: 160px;
+    flex-shrink: 1;
     padding: 0 8px 0 12px;
     border-radius: 11px;
     border: 1px solid var(--border);
