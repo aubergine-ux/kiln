@@ -12,5 +12,5 @@
     "noEmit": true,
     "paths": { "@shared/*": ["./src/shared/*"] }
   },
-  "include": ["electron.vite.config.ts", "src/main/**/*", "src/preload/**/*", "src/shared/**/*", "tests/unit/**/*", "tests/e2e/**/*", "vitest.config.ts", "playwright.config.ts"]
+  "include": ["electron.vite.config.ts", "src/main/**/*", "src/preload/**/*", "src/shared/**/*", "tests/unit/**/*", "tests/e2e/**/*", "playwright.config.ts"]
 }

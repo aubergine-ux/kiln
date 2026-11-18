@@ -42,6 +42,8 @@ export function iconDataUrl(buf: Buffer | undefined, size = 64): string | undefi
 
 /** Move to the system trash; fall back to deleting if the trash is unavailable. */
 export async function trash(target: string): Promise<void> {
+  // Automated tests delete for real instead of filling the system trash.
+  if (process.env.KILN_NO_TRASH) return fs.rm(target, { recursive: true, force: true })
   try {
     await shell.trashItem(target)
   } catch {
