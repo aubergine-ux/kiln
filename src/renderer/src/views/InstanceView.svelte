@@ -66,7 +66,7 @@
         <span class="chip">{inst.mcVersion}</span>
         {#if inst.loader !== 'vanilla'}<span class="chip accent">{loaderLabel(inst)}{inst.loaderVersion ? ` ${inst.loaderVersion}` : ''}</span>{/if}
         {#if inst.group}<span class="chip"><Icon name="Folder" size={12} /> {inst.group}</span>{/if}
-        <span class="sub">{plural(inst.modCount, 'mod')} · {memory(inst.memoryMb)} memory · Played {timeAgo(inst.lastPlayed).toLowerCase()}</span>
+        <span class="sub">{plural(inst.modCount, 'mod')} · {memory(inst.memoryMb)} memory · {inst.lastPlayed ? `Played ${timeAgo(inst.lastPlayed).toLowerCase()}` : 'Never played'}</span>
       </div>
     </div>
     <div class="head-actions">
@@ -78,7 +78,11 @@
     </div>
   </div>
 
-  {#if !inst.versionInstalled && tab !== 'settings'}
+  {#if inst.warning}
+    <div class="guide-wrap">
+      <div class="warning"><Icon name="TriangleAlert" size={18} /> <span>{inst.warning}</span></div>
+    </div>
+  {:else if !inst.versionInstalled && tab !== 'settings'}
     <div class="guide-wrap"><LoaderGuide instance={inst} compact /></div>
   {/if}
 
@@ -202,6 +206,21 @@
   }
   .guide-wrap {
     padding: 0 28px 14px;
+  }
+  .warning {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--warn) 9%, var(--surface));
+    border: 1px solid color-mix(in oklab, var(--warn) 30%, var(--border));
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+  .warning :global(.icon) {
+    color: color-mix(in oklab, var(--warn) 85%, var(--text));
+    margin-top: 1px;
   }
   .tabs {
     display: flex;

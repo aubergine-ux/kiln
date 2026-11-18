@@ -70,6 +70,8 @@ export interface InstanceConfig {
   /** Key of the matching entry in launcher_profiles.json */
   profileId: string
   notes?: string
+  /** Shown on the instance page, e.g. when an import uses something the official launcher can't run. */
+  warning?: string
 }
 
 export interface Instance extends InstanceConfig {

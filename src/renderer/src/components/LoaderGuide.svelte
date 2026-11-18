@@ -37,6 +37,9 @@
   <div class="icon"><Icon name="Wrench" size={20} /></div>
   <div class="body">
     <strong>Install {info.label} {inst.loaderVersion ?? ''} for {inst.mcVersion} to play this instance</strong>
+    {#if !/^1\.\d/.test(inst.mcVersion)}
+      <p>The official {info.label} installer may not support {inst.mcVersion}. Older and unusual setups often only run in the launcher they came from.</p>
+    {/if}
     {#if !compact}
       <ol>
         <li>Open the official launcher once, so the installer can find it.</li>

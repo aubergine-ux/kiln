@@ -53,14 +53,20 @@ interface Described extends ExternalInstance {
   iconFile?: string
   /** Files in gameFolder that belong to the other launcher and should not be copied. */
   skip: string[]
+  warning?: string
 }
 
 async function describePrism(dir: string, source: 'prism' | 'multimc'): Promise<Described | null> {
   const cfgText = await fs.readFile(path.join(dir, 'instance.cfg'), 'utf8').catch(() => null)
   if (cfgText === null) return null
   const cfg = parseIni(cfgText)
-  const pack = await readJson<{ components?: { uid: string; version?: string }[] }>(path.join(dir, 'mmc-pack.json'))
+  const pack = await readJson<{ components?: { uid: string; version?: string; cachedName?: string }[] }>(path.join(dir, 'mmc-pack.json'))
   const { mc, loader, loaderVersion } = loaderFromComponents(pack?.components ?? [])
+  // Jar mods patch the game itself; only Prism/MultiMC can apply them.
+  const jarMods = (pack?.components ?? []).filter((c) => c.uid.includes('.jarmod')).map((c) => c.cachedName ?? 'a jar mod')
+  const warning = jarMods.length
+    ? `This instance uses jar mods (${jarMods.join(', ')}) that only Prism Launcher or MultiMC can apply, so the official launcher can't run it as it is. Its worlds, screenshots and settings are all here.`
+    : undefined
   let gameFolder = path.join(dir, '.minecraft')
   if (!(await exists(gameFolder))) gameFolder = path.join(dir, 'minecraft')
 
@@ -85,7 +91,8 @@ async function describePrism(dir: string, source: 'prism' | 'multimc'): Promise<
     iconUrl: iconFile ? fileUrl(iconFile) : undefined,
     gameFolder,
     iconFile,
-    skip: []
+    skip: [],
+    warning
   }
 }
 
@@ -113,7 +120,7 @@ async function describe(dir: string): Promise<Described | null> {
   return null
 }
 
-const strip = ({ gameFolder: _g, iconFile: _i, skip: _s, ...rest }: Described): ExternalInstance => rest
+const strip = ({ gameFolder: _g, iconFile: _i, skip: _s, warning: _w, ...rest }: Described): ExternalInstance => rest
 
 /** Find instances from other launchers in their usual places. */
 export async function scanExternal(): Promise<ExternalInstance[]> {
@@ -158,7 +165,8 @@ export async function importExternal(dir: string): Promise<Instance> {
     mcVersion: d.mcVersion,
     loader: d.loader,
     loaderVersion: d.loaderVersion,
-    notes: `Imported from ${{ prism: 'Prism Launcher', multimc: 'MultiMC', curseforge: 'the CurseForge app' }[d.source]}`
+    notes: `Imported from ${{ prism: 'Prism Launcher', multimc: 'MultiMC', curseforge: 'the CurseForge app' }[d.source]}`,
+    warning: d.warning
   })
   const game = gameDir(s, id)
   const progress = progressReporter(`import:${dir}`, `Copying ${d.name}`, await countFiles(d.gameFolder))

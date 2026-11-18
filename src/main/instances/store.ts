@@ -123,7 +123,7 @@ function newProfileId(id: string): string {
 }
 
 /** Create the folders and config for a new instance. Does not touch the launcher. */
-export async function createInstanceFolder(input: NewInstance & { notes?: string }): Promise<string> {
+export async function createInstanceFolder(input: NewInstance & { notes?: string; warning?: string }): Promise<string> {
   const s = await getSettings()
   const name = input.name.trim()
   if (!name) throw new KilnError('Give the instance a name first.')
@@ -145,7 +145,8 @@ export async function createInstanceFolder(input: NewInstance & { notes?: string
     memoryMb: input.memoryMb ?? s.defaultMemoryMb,
     created: nowIso(),
     profileId: newProfileId(id),
-    notes: input.notes
+    notes: input.notes,
+    warning: input.warning
   }
   await writeConfig(id, config)
   return id
