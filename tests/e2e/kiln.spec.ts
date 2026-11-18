@@ -62,7 +62,7 @@ test.beforeAll(async () => {
   )
 
   app = await electron.launch({
-    args: [...(process.env.CI ? ['--no-sandbox'] : []), '.'],
+    args: [...(process.env.CI ? ['--no-sandbox', '--disable-gpu'] : []), '.'],
     env: { ...process.env, KILN_USER_DATA: userData, KILN_NO_TRASH: '1' }
   })
   win = await app.firstWindow()
@@ -72,8 +72,9 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
   // Under xvfb on CI, Electron sometimes never finishes closing; don't let that fail the run.
   const proc = app?.process()
-  const closed = await Promise.race([app?.close().then(() => true), new Promise<boolean>((r) => setTimeout(() => r(false), 10_000))])
-  if (!closed) proc?.kill('SIGKILL')
+  const exited = new Promise<boolean>((r) => (proc ? proc.once('exit', () => r(true)) : r(true)))
+  await app?.evaluate(({ app }) => app.exit(0)).catch(() => {})
+  if (!(await Promise.race([exited, new Promise<boolean>((r) => setTimeout(() => r(false), 10_000))]))) proc?.kill('SIGKILL')
   await fs.rm(root, { recursive: true, force: true }).catch(() => {})
 })
 
