@@ -9,6 +9,5 @@
 <style>
   img {
     display: block;
-    filter: drop-shadow(0 2px 6px rgb(229 96 47 / 0.3));
   }
 </style>

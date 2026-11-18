@@ -1,5 +1,6 @@
 import * as lucide from './iconset'
 import type { InstanceIcon } from '@shared/types'
+import { glyphPixels } from './glyphs'
 
 /** An icon as data: a list of SVG elements and their attributes (lucide's format). */
 export type IconNode = [string, Record<string, string | number>][]
@@ -15,103 +16,56 @@ export function icon(name: string): IconNode {
   return ((lucide as unknown as Record<string, IconNode>)[name] ?? lucide.Box) as IconNode
 }
 
-/** Glyphs offered for instance icons. */
-export const GLYPHS: Record<string, string> = {
-  pickaxe: 'Pickaxe',
-  sword: 'Sword',
-  swords: 'Swords',
-  axe: 'Axe',
-  hammer: 'Hammer',
-  shield: 'Shield',
-  tree: 'Trees',
-  leaf: 'Leaf',
-  sprout: 'Sprout',
-  mountain: 'Mountain',
-  castle: 'Castle',
-  tent: 'Tent',
-  ship: 'Ship',
-  compass: 'Compass',
-  map: 'Map',
-  gem: 'Gem',
-  crown: 'Crown',
-  flame: 'Flame',
-  zap: 'Zap',
-  potion: 'FlaskConical',
-  wand: 'Wand',
-  sparkles: 'Sparkles',
-  star: 'Star',
-  moon: 'Moon',
-  sun: 'Sun',
-  snowflake: 'Snowflake',
-  fish: 'Fish',
-  bird: 'Bird',
-  cat: 'Cat',
-  bone: 'Bone',
-  skull: 'Skull',
-  ghost: 'Ghost',
-  heart: 'Heart',
-  rocket: 'Rocket',
-  puzzle: 'Puzzle',
-  cherry: 'Cherry'
+/** Tile colours, named in instance.json by these keys. */
+export const TILE_COLORS: Record<string, string> = {
+  ember: '#c9531f',
+  rose: '#a5432f',
+  sand: '#b28a48',
+  moss: '#557a35',
+  teal: '#3d8574',
+  sky: '#2f5c9c',
+  violet: '#6b4f8e',
+  slate: '#6a645d'
 }
 
-/** Tile colours: [from, to] gradient stops. */
-export const TILE_COLORS: Record<string, [string, string]> = {
-  ember: ['#f06a35', '#f8a64a'],
-  rose: ['#e2487c', '#f5866b'],
-  violet: ['#7457e6', '#c46ae6'],
-  sky: ['#2f7fe0', '#4cc3ea'],
-  teal: ['#159a8c', '#5bd1a6'],
-  moss: ['#4a944a', '#9cc957'],
-  sand: ['#c98d3d', '#ecc56e'],
-  slate: ['#4b5563', '#8a96a8']
-}
-
-export function glyphNode(glyph: string): IconNode {
-  return icon(GLYPHS[glyph] ?? 'Box')
-}
-
-/** Draw an instance icon to a PNG (data: URL). This is what the official launcher shows. */
+/**
+ * Draw an instance icon as a PNG (data: URL). The official launcher shows this
+ * picture in its installation list, so it has to look right on its own.
+ */
 export async function renderIconPng(i: InstanceIcon, imageSrc?: string, size = 128): Promise<string> {
   const canvas = document.createElement('canvas')
   canvas.width = canvas.height = size
   const ctx = canvas.getContext('2d')!
-  const r = size * 0.22
 
   if (i.kind === 'image' && imageSrc) {
     const img = await loadImage(imageSrc)
-    // Cover-crop to a square.
     const s = Math.min(img.width, img.height)
     ctx.imageSmoothingEnabled = img.width >= size
     ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size)
     return canvas.toDataURL('image/png')
   }
 
-  const [from, to] = TILE_COLORS[(i as { color: string }).color] ?? TILE_COLORS.ember
-  const g = ctx.createLinearGradient(0, 0, size, size)
-  g.addColorStop(0, from)
-  g.addColorStop(1, to)
-  ctx.fillStyle = g
+  const r = size * 0.14
+  ctx.save()
   ctx.beginPath()
   ctx.roundRect(0, 0, size, size, r)
-  ctx.fill()
+  ctx.clip()
+  ctx.fillStyle = TILE_COLORS[(i as { color: string }).color] ?? TILE_COLORS.ember
+  ctx.fillRect(0, 0, size, size)
+  // A lighter top edge and darker bottom edge, like the face of a block.
+  ctx.fillStyle = 'rgba(255,255,255,0.16)'
+  ctx.fillRect(0, 0, size, size * 0.05)
+  ctx.fillStyle = 'rgba(0,0,0,0.18)'
+  ctx.fillRect(0, size * 0.92, size, size * 0.08)
+  ctx.restore()
 
-  // Soft highlight at the top.
-  const shine = ctx.createLinearGradient(0, 0, 0, size)
-  shine.addColorStop(0, 'rgba(255,255,255,0.22)')
-  shine.addColorStop(0.5, 'rgba(255,255,255,0)')
-  ctx.fillStyle = shine
-  ctx.beginPath()
-  ctx.roundRect(0, 0, size, size, r)
-  ctx.fill()
-
-  const glyphSize = size * 0.56
-  const svg = svgMarkup(glyphNode((i as { glyph: string }).glyph), glyphSize, 'white', 1.9)
-  const img = await loadImage(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`)
-  ctx.shadowColor = 'rgba(0,0,0,0.18)'
-  ctx.shadowBlur = size * 0.04
-  ctx.shadowOffsetY = size * 0.015
-  ctx.drawImage(img, (size - glyphSize) / 2, (size - glyphSize) / 2, glyphSize, glyphSize)
+  // Snap the 12x12 glyph to whole pixels so it stays crisp in the launcher.
+  const cell = Math.floor((size * 0.6) / 12)
+  const offset = Math.round((size - cell * 12) / 2)
+  for (const p of glyphPixels((i as { glyph: string }).glyph)) {
+    ctx.fillStyle = p.half ? 'rgba(255,255,255,0.55)' : '#fff'
+    ctx.fillRect(offset + p.x * cell, offset + p.y * cell - Math.round(size * 0.02), cell, cell)
+  }
   return canvas.toDataURL('image/png')
 }
 

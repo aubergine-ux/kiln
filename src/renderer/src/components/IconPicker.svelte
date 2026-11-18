@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { InstanceIcon as Icon_ } from '@shared/types'
-  import { fileToDataUrl, GLYPHS, TILE_COLORS } from '@/lib/icons'
+  import { fileToDataUrl, TILE_COLORS } from '@/lib/icons'
+  import { GLYPH_NAMES, glyphSvg } from '@/lib/glyphs'
   import InstanceIcon from './InstanceIcon.svelte'
-  import Icon from './Icon.svelte'
 
   /** Pick a glyph + colour, or upload an image. `imageUrl` holds an uploaded image (data: URL). */
   let { value = $bindable(), imageUrl = $bindable() }: { value: Icon_; imageUrl?: string } = $props()
@@ -22,27 +22,27 @@
 <div class="picker">
   <div class="preview">
     <InstanceIcon icon={value} url={value.kind === 'image' ? imageUrl : undefined} size={88} />
-    <button class="btn sm" onclick={() => fileInput?.click()}><Icon name="Upload" size={15} /> Upload image</button>
+    <button class="btn sm" onclick={() => fileInput?.click()}>Use an image</button>
     <input bind:this={fileInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden onchange={upload} />
   </div>
   <div class="choices">
     <div class="colors" role="radiogroup" aria-label="Colour">
-      {#each Object.entries(TILE_COLORS) as [name, [a, b]] (name)}
+      {#each Object.entries(TILE_COLORS) as [name, color] (name)}
         <button
           role="radio"
           aria-checked={value.kind === 'glyph' && color === name}
           aria-label={name}
           class="swatch"
           class:on={value.kind === 'glyph' && color === name}
-          style:background="linear-gradient(135deg, {a}, {b})"
+          style:background={color}
           onclick={() => (value = { kind: 'glyph', glyph, color: name })}
         ></button>
       {/each}
     </div>
-    <div class="glyphs" role="radiogroup" aria-label="Symbol">
-      {#each Object.keys(GLYPHS) as g (g)}
+    <div class="glyphs" role="radiogroup" aria-label="Symbol" style:--tile={TILE_COLORS[color] ?? TILE_COLORS.ember}>
+      {#each GLYPH_NAMES as g (g)}
         <button role="radio" aria-checked={value.kind === 'glyph' && glyph === g} aria-label={g} title={g} class:on={value.kind === 'glyph' && glyph === g} onclick={() => (value = { kind: 'glyph', glyph: g, color })}>
-          <Icon name={GLYPHS[g]} size={20} />
+          {@html glyphSvg(g, 24)}
         </button>
       {/each}
     </div>
@@ -71,42 +71,36 @@
     margin-bottom: 12px;
   }
   .swatch {
-    width: 28px;
-    height: 28px;
-    border-radius: 9px;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--r-1);
     border: none;
-    transition: transform var(--fast) var(--ease-spring);
-  }
-  .swatch:hover {
-    transform: scale(1.12);
+    box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.2);
   }
   .swatch.on {
-    box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text);
+    box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.2), 0 0 0 2px var(--surface), 0 0 0 4px var(--text);
   }
   .glyphs {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
-    gap: 4px;
-    max-height: 168px;
-    overflow: auto;
-    padding: 2px;
+    grid-template-columns: repeat(8, 38px);
+    gap: 6px;
+    padding: 4px;
   }
   .glyphs button {
     height: 38px;
-    border-radius: 10px;
-    border: 1px solid transparent;
-    background: none;
-    color: var(--text-2);
+    border-radius: var(--r-1);
+    border: none;
+    background: var(--tile);
     display: grid;
     place-items: center;
-    transition: background var(--fast);
+    opacity: 0.55;
+    box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.2);
   }
   .glyphs button:hover {
-    background: var(--surface-2);
+    opacity: 0.85;
   }
   .glyphs button.on {
-    background: var(--accent-soft);
-    border-color: color-mix(in oklab, var(--accent) 40%, transparent);
-    color: var(--accent-text);
+    opacity: 1;
+    box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.2), 0 0 0 2px var(--surface), 0 0 0 4px var(--text);
   }
 </style>
