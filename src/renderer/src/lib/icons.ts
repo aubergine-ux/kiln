@@ -1,4 +1,4 @@
-import * as lucide from 'lucide'
+import * as lucide from './iconset'
 import type { InstanceIcon } from '@shared/types'
 
 /** An icon as data: a list of SVG elements and their attributes (lucide's format). */
